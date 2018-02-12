@@ -343,11 +343,12 @@
                                                             <br />
                                                             <div class="row">
                                                                 <div class="col-md-4 col-sm-4 text-center">
-                                                                    <div class="">
+                                                                    <div class="hidden">
                                                                         <img src="<%# DataBinder.Eval(Container.DataItem, "filePath") %>" class="img-responsive" alt="<%# DataBinder.Eval(Container.DataItem, "name") %>" />
-                                                                        <span class="hidden"><strong>FileName:</strong> <%# DataBinder.Eval(Container.DataItem, "fileName") %><br />
-                                                                            <strong>Date:</strong> <%# DataBinder.Eval(Container.DataItem, "dateCreated") %>
-                                                                        </span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <asp:Image ID="picCon" runat="server" CssClass="img-responsive" />
+
                                                                     </div>
                                                                     <br />
                                                                     <br />

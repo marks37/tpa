@@ -679,215 +679,117 @@ public partial class new_visibility : System.Web.UI.Page
         }
     }
     protected void myFile_UploadedComplete(object sender, AsyncFileUploadEventArgs e)
-    {
-        
+    {   
         ImageHandler imageHandler = new ImageHandler();
         string contentType = myFile.ContentType;
-
         clsUser user = (clsUser)Session["user"];
         string oldpath;
         string newpath;
+        string strDirectory = DBLayer.GetCurrentTime().ToString("yyyyMM");
+        string tmpDirectory =  "temp";
+        DateTime? dateTaken = null;
+        string extension = Path.GetExtension(e.FileName);
 
-        if (contentType.Equals("image/jpeg") || contentType.Equals("image/gif")
-              || contentType.Equals("image/png") || contentType.Equals("image/jpg"))
+        if (contentType.Equals("image/jpeg") || contentType.Equals("image/gif") || contentType.Equals("image/png") || contentType.Equals("image/jpg"))
         {
-            if (!ftpLayer.createDirectory("201701"))
+            Stream imageStr = myFile.FileContent;
+            if (ftpLayer.createDirectory(strDirectory))
             {
-                ftpLayer.createDirectory("201701");
-            }
+                // Extract date captured.  
+                using(System.Drawing.Image image = new Bitmap(imageStr)){
+                    int OrientationId = 0x132;
+                    int[] ids = image.PropertyIdList;
+                    PropertyItem propItem = null;
+                    if (ids.Contains(OrientationId))
+                    {
+                        propItem = image.GetPropertyItem(OrientationId);
+                    }
+                    //Get the Date Created property  
+                    if (propItem != null)
+                    {
+                        // Extract the property value (a string).  
+                        System.Text.ASCIIEncoding encoding = new System.Text.ASCIIEncoding();
+                        string text = encoding.GetString(propItem.Value, 0, propItem.Len - 1);
 
-            string serverPath = Server.MapPath("~/Images/Temp");
-            //System.IO.Directory.CreateDirectory(Server.MapPath("~/Images/Temp/"));
-            var directory = System.IO.Directory.CreateDirectory(serverPath);
-
-            //// Specify the path to save the uploaded file to.
-            string savePath = "~/Images/Temp/";
-
-            //// Get the name of the file to upload.
-            string fileName = Path.GetFileName(e.FileName);
-            string extension = Path.GetExtension(e.FileName);
-            //string fullPath = Path.GetFullPath(e.FileName);
-
-            //// Create the path and file name to check for duplicates.
-            string pathToCheck = savePath + fileName;
-
-            //// Create a temporary file name to use for checking duplicates.
-            string tempfileName = "";
-
-            //// Check to see if a file already exists with the
-            //// same name as the file to upload.
-            if (System.IO.File.Exists(Server.MapPath(pathToCheck)))
-            {
-                int counter = 2;
-                while (System.IO.File.Exists(Server.MapPath(pathToCheck)))
-                {
-                    // if a file with this name already exists,
-                    // prefix the filename with a number.
-                    tempfileName = counter.ToString() + "_" + fileName;
-                    pathToCheck = savePath + tempfileName;
-                    counter++;
+                        // Parse the date and time.  
+                        System.Globalization.CultureInfo provider = CultureInfo.InvariantCulture;
+                        dateTaken = DateTime.ParseExact(text, "yyyy:MM:d H:m:s", provider);
+                    }
                 }
-                fileName = tempfileName;
-                // Notify the user that the file name was changed.
-                //UploadStatusLabel.Text = "A file with the same name already exists." +
-                //    "<br />Your file was saved as " + fileName;
-                
-            }
-            else
-            {
-                // Notify the user that the file was saved successfully.
-                //UploadStatusLabel.Text = "Your file was uploaded successfully.";
-            }
 
-            // Append the name of the file to upload to the path.
-            //savePath += fileName;
-            // Call the SaveAs method to save the uploaded
-            // file to the specified directory.
-            //FileUpload1.SaveAs(savePath);
-            //Stream streamF = myFile.FileContent;
-            //Bitmap image = new Bitmap(streamF);
-            //myFile.SaveAs(Server.MapPath(savePath + fileName));
+                //Create pic name using pic Id from db
+                string pictureId;
 
-            Bitmap bitmap = new Bitmap(myFile.FileContent);
-            imageHandler.Save(bitmap,1000,1000,75, Server.MapPath(savePath + fileName));
-            oldpath = savePath + fileName;
-            string file = Server.MapPath(savePath + fileName);
-
-            //// Load an image however you like.  
-            System.Drawing.Image image = new Bitmap(file);
-            DateTime? dateTaken = null;
-
-            int OrientationId = 0x132;
-            int[] ids = image.PropertyIdList;
-            System.Drawing.Imaging.PropertyItem propItem = null;
-            if (ids.Contains(OrientationId))
-            {
-                propItem = image.GetPropertyItem(OrientationId);
-            }
-
-            //Get the Date Created property  
-            if (propItem != null)
-            {
-                // Extract the property value (a string).  
-                System.Text.ASCIIEncoding encoding = new System.Text.ASCIIEncoding();
-                string text = encoding.GetString(propItem.Value, 0, propItem.Len - 1);
-
-                // Parse the date and time.  
-                System.Globalization.CultureInfo provider = CultureInfo.InvariantCulture;
-                dateTaken = DateTime.ParseExact(text, "yyyy:MM:d H:m:s", provider);
-            }
-            image.Dispose();
-
-            string responseId = responseIdHidden.Value;
-            string name;
-            string workplanId = Request.QueryString["pk"];
-
-            clsVisibilityPicture picture = new clsVisibilityPicture();
-            clsVisibilityResponse response = DBLayer.getVisibilityResponseByResponseId(responseId);
-            clsWorkplan workplan = DBLayer.getWorkplan(workplanId);
-            clsVisibilitySurvey survey = DBLayer.getVisibilitySurveyBySurveyId(response.SurveyId);
-            DateTime capturedDate = GetCurrentTime();
-
-            // Format name
-            if (!dateTaken.HasValue)
-            {
-                picture.DateCaptured = capturedDate.ToString();
-                name = workplan.AccountCode + "_" + cleanFileName(survey.ItemCode) + "_" + response.Code + "_" + capturedDate.ToString("yyyyMMdd");
-            }
-            else
-            {
-                capturedDate = (DateTime)dateTaken;
-                picture.DateCaptured = capturedDate.ToString();
-                name = workplan.AccountCode + "_" + cleanFileName(survey.ItemCode) + "_" + response.Code + "_" + capturedDate.ToString("yyyyMMdd");
-            }
-
-            //name = "test";
-            // Specify the path to save the uploaded file to.
-            savePath = "~/Images/";
-
-            // Create the path and file name to check for duplicates.
-            pathToCheck = savePath + name + extension;
-
-            // Create a temporary file name to use for checking duplicates.
-            tempfileName = "";
-
-            // Check to see if a file already exists with the
-            // same name as the file to upload.
-            if (System.IO.File.Exists(Server.MapPath(pathToCheck)))
-            {
-                int counter = 2;
-                while (System.IO.File.Exists(Server.MapPath(pathToCheck)))
+                using (var entitiesContext = new Entities())
                 {
-                    // if a file with this name already exists,
-                    // prefix the filename with a number.
-                    tempfileName = name + "_" + counter.ToString() + extension;
-                    pathToCheck = savePath + tempfileName;
-                    counter++;
+                    Data_Visibility_Picture pic = new Data_Visibility_Picture();
+                    pic.response_id = int.Parse(responseIdHidden.Value);
+                    pic.user_id = int.Parse(user.Id);
+                    pic.date_created = DBLayer.GetCurrentTime();
+
+                    if (dateTaken.HasValue)
+                    {
+                        pic.date_captured = dateTaken;
+                        pic.date_captured2 = dateTaken;
+                    }
+                    else
+                    {
+                        pic.date_captured = DBLayer.GetCurrentTime();
+                    }
+
+                    entitiesContext.Data_Visibility_Picture.Add(pic);
+                    entitiesContext.SaveChanges();
+                    pictureId = pic.id.ToString();
                 }
-                name = tempfileName;
-                // Notify the user that the file name was changed.
-                //UploadStatusLabel.Text = "A file with the same name already exists." +
-                //    "<br />Your file was saved as " + fileName;
+
+                String name = "VISIB" + "_" + DBLayer.GetCurrentTime().ToString("yyyyMMdd") + "_" + pictureId + extension;
+                String thumbnail_name = "VISIB" + "_" + DBLayer.GetCurrentTime().ToString("yyyyMMdd") + "_" + pictureId + "_thumbnail" + extension;
+
+                //Check if pic name has duplicates
+                while (ftpLayer.exists(strDirectory + "/"+name))
+                {
+
+                }
+
+                //Compress pic
+                Stream compressedImage = imageHandler.compressImage(myFile.FileContent,1080,1920,75);
+                Stream compressedThumbnail = imageHandler.compressImage(myFile.FileContent, 300, 640, 25);
+                Bitmap sample = new Bitmap(compressedImage);
+
+                //Save pic
+                ftpLayer.uploadImage(compressedImage, strDirectory + "/" + name);
+                ftpLayer.uploadImage(compressedThumbnail, strDirectory + "/" + thumbnail_name);
+
+                //Update pic entry in db
+                using (Entities context = new Entities())
+                {
+                    var picEntry = context.Data_Visibility_Picture.Find(int.Parse(pictureId));
+                    picEntry.name = name;
+                    picEntry.file_name = name;
+                    picEntry.file_path = strDirectory + "/" + name;
+                    picEntry.file_size_b = compressedImage.Length;
+                    picEntry.thumbnail_name = thumbnail_name;
+                    picEntry.thumbnail_path = strDirectory + "/" + thumbnail_name;
+                    picEntry.height = sample.Height;
+                    picEntry.width = sample.Width;
+
+                    Data_User_Activity_Log act_log = new Data_User_Activity_Log();
+                    act_log.username = user.Username;
+                    act_log.dateCreated = DBLayer.GetCurrentTime();
+                    act_log.pageUrl = HttpContext.Current.Request.Url.AbsolutePath;
+                    act_log.activity = "uploaded " + name + " in response::" + responseIdHidden.Value;
+                    context.Data_User_Activity_Log.Add(act_log);
+
+                    context.SaveChanges();
+                }
 
             }
-            else
-            {
-                // Notify the user that the file was saved successfully.
-                //UploadStatusLabel.Text = "Your file was uploaded successfully.";
-                name += extension;
-            }
-            newpath = savePath + name;
-            // Append the name of the file to upload to the path.
-            //savePath += fileName;
-            // Call the SaveAs method to save the uploaded
-            // file to the specified directory.
-            //myFile.SaveAs(Server.MapPath(savePath + name));
-            System.IO.File.Copy(Server.MapPath(oldpath), Server.MapPath(newpath));
-            //System.IO.DirectoryInfo di = new DirectoryInfo(Server.MapPath("~/Images/Temp/"));
-            //System.IO.DirectoryInfo di = new DirectoryInfo(serverPath);
-
-            //Clear temp folder
-            //foreach (FileInfo item in di.GetFiles())
-            //{
-            //    item.Delete();
-            //}
 
 
-            System.IO.DirectoryInfo di = new DirectoryInfo(serverPath);
-
-            foreach (FileInfo item in di.GetFiles())
-            {
-                item.Delete();
-            }
-            foreach (DirectoryInfo dir in di.GetDirectories())
-            {
-                dir.Delete(true);
-            }
-
-            picture.Name = name;
-            picture.FileName = name;
-            picture.FilePath = "Images/" + name;
-            picture.ResponseId = responseId;
-            picture.Userid = user.Id;
-            picture.DateCreated = capturedDate.ToString();
-            DBLayer.addVisibilityPicturesByResponseId(picture);
-
-            if (user != null)
-            {
-                clsActivityLog log = new clsActivityLog();
-                log.Username = user.Username;
-                log.DateCreated = DBLayer.GetCurrentTime().ToString();
-                log.PageUrl = HttpContext.Current.Request.Url.AbsolutePath;
-                log.Activity = "uploaded "+name+" in response::" + responseId;
-                DBLayer.addNewActivityLog(log);
-            }     
         }
         else
         {
             alertMessage.Text = "We support only images of type jpg, gif and png";
-            //ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "alertModal();", true);
-            //myFileValidation.Text = "We support only images of type jpg, gif and png";
-
         }
 
         
@@ -928,6 +830,12 @@ public partial class new_visibility : System.Web.UI.Page
             deleteBtn.CommandArgument = pictureId;
             TextBox remarks = (TextBox)e.Item.FindControl("remarks");
             remarks.Text = picture.Remarks;
+
+
+
+            System.Web.UI.WebControls.Image img = (System.Web.UI.WebControls.Image)e.Item.FindControl("picCon");
+            //Stream image = ftpLayer.downloadImage(((clsVisibilityPicture)e.Item.DataItem).FilePath);
+            img.ImageUrl = ResolveUrl("~/FTPImageHandler.ashx?id="+pictureId);
             //DropDownList shelfBrandDDL = (DropDownList)e.Item.FindControl("shelfBrandDDL");
             //List<clsVisibilityShelfBrand> shelfList = DBLayer.getShelfBrandList();
             //foreach (clsVisibilityShelfBrand shelf in shelfList)
@@ -949,19 +857,19 @@ public partial class new_visibility : System.Web.UI.Page
             clsVisibilityResponse response = DBLayer.getVisibilityResponseByResponseId(responseId);
             TextBox measureTxtBox = (TextBox)e.Item.FindControl("measure");
             measureTxtBox.Text = response.Code;
+
             DateTime? temp = null;
-            temp =  DateTime.Parse(((clsVisibilityPicture)e.Item.DataItem).DateCaptured);
-            if (!temp.HasValue)
+            if ((((clsVisibilityPicture)e.Item.DataItem).DateCaptured2) == "")
+            {
+                temp = DateTime.Parse(((clsVisibilityPicture)e.Item.DataItem).DateCaptured);
+            }
+            else
             {
                 temp = DateTime.Parse(((clsVisibilityPicture)e.Item.DataItem).DateCaptured2);
             }
-            DateTime result = DateTime.Parse(((clsVisibilityPicture)e.Item.DataItem).DateCaptured);
             TextBox dateCaptured = (TextBox)e.Item.FindControl("dateCaptured");
-            if (temp.HasValue)
-            {
-
-            }
-            dateCaptured.Text = result.ToString("yyyy-MM-dd");
+            dateCaptured.Text = ((DateTime)temp).ToString("yyyy-MM-dd");
+            
             string workplanId = Request.QueryString["pk"];
             clsWorkplan workplan = DBLayer.getWorkplan(workplanId);
             TextBox branchCode = (TextBox)e.Item.FindControl("branchCode");
@@ -1000,37 +908,50 @@ public partial class new_visibility : System.Web.UI.Page
         if (e.CommandName == "deletePic")
         {
             string pictureId = (string)e.CommandArgument;
-            clsVisibilityPicture picture = DBLayer.getVisibilityPictureById(pictureId);
 
-            if ((System.IO.File.Exists(Server.MapPath(picture.FilePath))))
+            using (var entity = new Entities())
             {
-                System.IO.File.Delete(Server.MapPath(picture.FilePath));
+                var picture = entity.Data_Visibility_Picture.Find(int.Parse(pictureId));
+
+                if (ftpLayer.exists(picture.file_path))
+                {
+                    ftpLayer.delete(picture.file_path);
+                }
+                if (ftpLayer.exists(picture.thumbnail_path))
+                {
+                    ftpLayer.delete(picture.thumbnail_path);
+                }
+
+                DBLayer.removeVisibilityPictureById(pictureId);
+                e.Item.Visible = false;
+                string responseId = responseIdHidden.Value;
+                List<clsVisibilityPicture> pictureList = DBLayer.getVisibilityPicturesByResponseId(responseId);
+                picRepeater.DataSource = pictureList;
+                picRepeater.DataBind();
+                string message = "";
+                if (pictureList.Count() == 0)
+                {
+                    message += "<br><br><br><br><br><br><br>";
+                    message += "<h1 class='text-muted text-center'>There are no pictures! <br>Click the upload button to add one.</h1>";
+                }
+                pictureMessage.Text = message;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "refreshParent();", true);
+                clsUser user = (clsUser)Session["user"];
+                if (user != null)
+                {
+                    clsActivityLog log = new clsActivityLog();
+                    log.Username = user.Username;
+                    log.DateCreated = DBLayer.GetCurrentTime().ToString();
+                    log.PageUrl = HttpContext.Current.Request.Url.AbsolutePath;
+                    log.Activity = "deleted " + picture.file_name + " in response::" + responseId;
+                    DBLayer.addNewActivityLog(log);
+                }
+
             }
 
-            DBLayer.removeVisibilityPictureById(pictureId);
-            e.Item.Visible = false;
-            string responseId = responseIdHidden.Value;
-            List<clsVisibilityPicture> pictureList = DBLayer.getVisibilityPicturesByResponseId(responseId);
-            picRepeater.DataSource = pictureList;
-            picRepeater.DataBind();
-            string message = "";
-            if (pictureList.Count() == 0)
-            {
-                message += "<br><br><br><br><br><br><br>";
-                message += "<h1 class='text-muted text-center'>There are no pictures! <br>Click the upload button to add one.</h1>";
-            }
-            pictureMessage.Text = message;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "refreshParent();", true);
-            clsUser user = (clsUser)Session["user"];
-            if (user != null)
-            {
-                clsActivityLog log = new clsActivityLog();
-                log.Username = user.Username;
-                log.DateCreated = DBLayer.GetCurrentTime().ToString();
-                log.PageUrl = HttpContext.Current.Request.Url.AbsolutePath;
-                log.Activity = "deleted "+picture.Name+" in response::" + responseId;
-                DBLayer.addNewActivityLog(log);
-            }     
+
+
+                 
         }
     }
     protected void saveBtn_Click(object sender, EventArgs e)

@@ -31,6 +31,7 @@ public partial class Entities : DbContext
     public virtual DbSet<vw_visibility_surveys_tl> vw_visibility_surveys_tl { get; set; }
     public virtual DbSet<vw_visibility_surveys> vw_visibility_surveys { get; set; }
     public virtual DbSet<Ref_User> Ref_User { get; set; }
+    public virtual DbSet<Data_Visibility_Picture> Data_Visibility_Picture { get; set; }
 
     public virtual int sp_getWorkplansTLViewByUserId(Nullable<int> userId)
     {

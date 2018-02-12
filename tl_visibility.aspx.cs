@@ -17,7 +17,10 @@ public partial class tl_visibility : System.Web.UI.Page
         clsUser user = (clsUser)Session["user"];
         if (Session["user"] == null)
         {
-            Response.Redirect("Site_Login.aspx");
+            if (!Page.IsCallback)
+            {
+                Response.Redirect("~/Site_Login.aspx");
+            }
         }
         else
         {
@@ -126,6 +129,14 @@ public partial class tl_visibility : System.Web.UI.Page
     protected void EntityServerModeDataSource1_Selecting(object sender, DevExpress.Data.Linq.LinqServerModeDataSourceSelectEventArgs e)
     {
         clsUser user = (clsUser)Session["user"];
+        if (Session["user"] == null)
+        {
+            if (!Page.IsCallback)
+            {
+                Response.Redirect("~/Site_Login.aspx");
+            }
+        }
+
         int userId = int.Parse(user.Id);
         
         //IQueryable<vw_visibility_surveys_tl> query = new Entities().vw_visibility_surveys_tl;

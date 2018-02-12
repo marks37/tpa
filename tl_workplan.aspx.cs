@@ -179,8 +179,9 @@ public partial class tl_workplan : System.Web.UI.Page
         cleanWorkplan.UserId = HttpContext.Current.Server.HtmlEncode(workplan.UserId);
 
         DateTime currentTime = DBLayer.GetCurrentTime();
-        DateTime maxDate = currentTime.AddMonths(3-(currentTime.Month-1)%3).AddDays(-currentTime.Day);
-        DateTime minDate = new DateTime(currentTime.Year, ((currentTime.Month - 1) / 3) * 3 + 1,1);
+        DateTime targetTime = DateTime.ParseExact(cleanWorkplan.CallDate, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+        DateTime maxDate = targetTime.AddMonths(3 - (targetTime.Month - 1) % 3).AddDays(-targetTime.Day);
+        DateTime minDate = new DateTime(targetTime.Year, ((targetTime.Month - 1) / 3) * 3 + 1, 1);
 
 
         List<clsWorkplan> matches = DBLayer.findMatchesWorkplan(cleanWorkplan, minDate, maxDate);

@@ -15,6 +15,30 @@
           <Property Name="activity" Type="nvarchar(max)" />
           <Property Name="dateCreated" Type="datetime" />
         </EntityType>
+        <EntityType Name="Data_Visibility_Picture">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+          <Property Name="date_created" Type="datetime" />
+          <Property Name="date_modified" Type="datetime" />
+          <Property Name="is_deleted" Type="int" />
+          <Property Name="user_id" Type="int" />
+          <Property Name="remarks" Type="text" />
+          <Property Name="brands" Type="text" />
+          <Property Name="response_id" Type="int" />
+          <Property Name="file_path" Type="ntext" />
+          <Property Name="file_name" Type="ntext" />
+          <Property Name="date_captured" Type="datetime" />
+          <Property Name="shelf_id" Type="int" />
+          <Property Name="date_captured2" Type="datetime" />
+          <Property Name="file_size_b" Type="bigint" />
+          <Property Name="height" Type="int" />
+          <Property Name="width" Type="int" />
+          <Property Name="thumbnail_path" Type="ntext" />
+          <Property Name="thumbnail_name" Type="ntext" />
+        </EntityType>
         <EntityType Name="Data_Workplan">
           <Key>
             <PropertyRef Name="id" />
@@ -124,6 +148,7 @@ warning 6002: The table/view 'DB_A1321A_visibsandbox.dbo.vw_visibility_surveys_t
         </EntityType>
         <EntityContainer Name="Visibility_System_DatabaseModelStoreContainer">
           <EntitySet Name="Data_User_Activity_Log" EntityType="Self.Data_User_Activity_Log" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Data_Visibility_Picture" EntityType="Self.Data_Visibility_Picture" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Data_Workplan" EntityType="Self.Data_Workplan" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Ref_User" EntityType="Self.Ref_User" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vw_data_workplan_tl" EntityType="Self.vw_data_workplan_tl" store:Type="Views" store:Schema="dbo">
@@ -227,6 +252,7 @@ warning 6002: The table/view 'DB_A1321A_visibsandbox.dbo.vw_visibility_surveys_t
           <Parameter Name="Id" Mode="In" Type="Int32" />
           </FunctionImport>
           <EntitySet Name="Ref_User" EntityType="Visibility_System_DatabaseModel.Ref_User" />
+          <EntitySet Name="Data_Visibility_Picture" EntityType="Visibility_System_DatabaseModel.Data_Visibility_Picture" />
         </EntityContainer>
         <EntityType Name="Data_Workplan">
           <Key>
@@ -331,6 +357,30 @@ warning 6002: The table/view 'DB_A1321A_visibsandbox.dbo.vw_visibility_surveys_t
           <Property Name="email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="agency" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="team_leader" Type="Int32" />
+        </EntityType>
+        <EntityType Name="Data_Visibility_Picture">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="date_created" Type="DateTime" Precision="3" />
+          <Property Name="date_modified" Type="DateTime" Precision="3" />
+          <Property Name="is_deleted" Type="Int32" />
+          <Property Name="user_id" Type="Int32" />
+          <Property Name="remarks" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="brands" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="response_id" Type="Int32" />
+          <Property Name="file_path" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="file_name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="date_captured" Type="DateTime" Precision="3" />
+          <Property Name="shelf_id" Type="Int32" />
+          <Property Name="date_captured2" Type="DateTime" Precision="3" />
+          <Property Name="height" Type="Int32" />
+          <Property Name="width" Type="Int32" />
+          <Property Name="thumbnail_path" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="thumbnail_name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="file_size_b" Type="Int64" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -451,6 +501,31 @@ warning 6002: The table/view 'DB_A1321A_visibsandbox.dbo.vw_visibility_surveys_t
                 <ScalarProperty Name="fullname" ColumnName="fullname" />
                 <ScalarProperty Name="password" ColumnName="password" />
                 <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Data_Visibility_Picture">
+            <EntityTypeMapping TypeName="Visibility_System_DatabaseModel.Data_Visibility_Picture">
+              <MappingFragment StoreEntitySet="Data_Visibility_Picture">
+                <ScalarProperty Name="file_size_b" ColumnName="file_size_b" />
+                <ScalarProperty Name="thumbnail_name" ColumnName="thumbnail_name" />
+                <ScalarProperty Name="thumbnail_path" ColumnName="thumbnail_path" />
+                <ScalarProperty Name="width" ColumnName="width" />
+                <ScalarProperty Name="height" ColumnName="height" />
+                <ScalarProperty Name="date_captured2" ColumnName="date_captured2" />
+                <ScalarProperty Name="shelf_id" ColumnName="shelf_id" />
+                <ScalarProperty Name="date_captured" ColumnName="date_captured" />
+                <ScalarProperty Name="file_name" ColumnName="file_name" />
+                <ScalarProperty Name="file_path" ColumnName="file_path" />
+                <ScalarProperty Name="response_id" ColumnName="response_id" />
+                <ScalarProperty Name="brands" ColumnName="brands" />
+                <ScalarProperty Name="remarks" ColumnName="remarks" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="is_deleted" ColumnName="is_deleted" />
+                <ScalarProperty Name="date_modified" ColumnName="date_modified" />
+                <ScalarProperty Name="date_created" ColumnName="date_created" />
+                <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

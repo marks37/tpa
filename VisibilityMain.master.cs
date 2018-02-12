@@ -18,6 +18,7 @@ public partial class Visibility : System.Web.UI.MasterPage
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        TimeoutControl.TimeOutUrl = "~/Site_Login.aspx?expired=1";
         Page.Header.DataBind();
         sTargetURLForSessionTimeout = "/Site_Login.aspx";
         int iNumberOfMinutesBeforeSessionTimeoutToWarnUser = 1;
@@ -37,7 +38,10 @@ public partial class Visibility : System.Web.UI.MasterPage
         clsUser user = (clsUser)Session["user"];
         if (Session["user"] == null)
         {
-            Response.Redirect("~/Site_Login.aspx");
+            if (!Page.IsCallback)
+            {
+                Response.Redirect("~/Site_Login.aspx");
+            }
         }
         else
         {

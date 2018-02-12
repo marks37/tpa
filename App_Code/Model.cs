@@ -19,6 +19,29 @@ public partial class Data_User_Activity_Log
     public Nullable<System.DateTime> dateCreated { get; set; }
 }
 
+public partial class Data_Visibility_Picture
+{
+    public int id { get; set; }
+    public string name { get; set; }
+    public Nullable<System.DateTime> date_created { get; set; }
+    public Nullable<System.DateTime> date_modified { get; set; }
+    public Nullable<int> is_deleted { get; set; }
+    public Nullable<int> user_id { get; set; }
+    public string remarks { get; set; }
+    public string brands { get; set; }
+    public Nullable<int> response_id { get; set; }
+    public string file_path { get; set; }
+    public string file_name { get; set; }
+    public Nullable<System.DateTime> date_captured { get; set; }
+    public Nullable<int> shelf_id { get; set; }
+    public Nullable<System.DateTime> date_captured2 { get; set; }
+    public Nullable<int> height { get; set; }
+    public Nullable<int> width { get; set; }
+    public string thumbnail_path { get; set; }
+    public string thumbnail_name { get; set; }
+    public Nullable<long> file_size_b { get; set; }
+}
+
 public partial class Data_Workplan
 {
     public int id { get; set; }
