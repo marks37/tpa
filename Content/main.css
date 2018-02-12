@@ -1,0 +1,59 @@
+﻿body {
+}
+
+a > .panel-primary > .panel-heading {
+    color: #fff;
+}
+
+a.panel{
+   text-decoration: none;
+}
+
+a:hover.panel>.panel{
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.panel-heading{
+    padding-top: 40px;
+    padding-bottom: 40px;
+    text-align: center;
+}
+
+.panel-green{
+    border-color: #5cb85c;
+}
+
+.panel-green > .panel-heading{
+    border-color: #5cb85c;
+    color: #fff;
+    background-color: #5cb85c;
+}
+
+.panel-green > a{
+    color: #5cb85c;
+    cursor: pointer;
+}
+
+.panel-green > a:hover {
+    color: #3d8b3d;
+}
+
+.panel-yellow{
+    border-color: #f0ad4e;
+}
+
+.panel-yellow > .panel-heading {
+    border-color: #f0ad4e;
+    color: #fff;
+    background-color: #f0ad4e;
+}
+
+.panel-yellow > a {
+    color: #f0ad4e;
+    cursor: pointer;
+}
+
+.panel-yellow > a:hover {
+    color: #df8a13;
+}
