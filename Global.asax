@@ -11,4 +11,12 @@
         BundleConfig.RegisterBundles(BundleTable.Bundles);
     }
 
+    void Session_Start(object sender, EventArgs e)
+    {
+        if (Session["user"] == null)
+        {
+            //Response.Redirect("~/Site_Login.aspx?session=expired");                    
+        }
+    }
+    
 </script>

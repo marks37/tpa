@@ -20,13 +20,14 @@ using System.Drawing.Drawing2D;
 public partial class new_visibility : System.Web.UI.Page
 {
     clsDBLayer DBLayer = new clsDBLayer(ConfigurationManager.ConnectionStrings["VisibilityDB"].ToString());
+    clsFTPLayer ftpLayer = new clsFTPLayer("tpa", "~!n0v3mb3r@@2017!~", "23.89.193.176", 80, "ftp");
     //Will user this later for saving visibility to db without querying data from db
     List<clsVisibility> visibilityList = new List<clsVisibility>();
     List<clsVisibilitySurvey> surveyList = new List<clsVisibilitySurvey>();
-    private Boolean workplanHasContent;
-    private List<clsVisibilityPicture> tempPictures;
-    private List<clsVisibilityPicture> savedPictures;
-    private List<clsVisibilityPicture> addedPictures;
+    //private Boolean workplanHasContent;
+    //private List<clsVisibilityPicture> tempPictures;
+    //private List<clsVisibilityPicture> savedPictures;
+    //private List<clsVisibilityPicture> addedPictures;
     private string message;
 
     protected override void OnPreRender(EventArgs e)
@@ -35,7 +36,7 @@ public partial class new_visibility : System.Web.UI.Page
         if (message != null)
         {
             validationSummary.Text = message;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showAlert();", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop1", "showAlert();", true);
         }
     }
 
@@ -51,11 +52,11 @@ public partial class new_visibility : System.Web.UI.Page
         Page.Form.Attributes.Add("enctype", "multipart/form-data");
         if (!IsPostBack)
         {
-
+            var visibLink = (HtmlGenericControl)this.Master.FindControl("visibLink");
+            visibLink.Attributes.Add("class", "active");
             if (user.Type.Equals("Team Leader"))
             {
-                var visibLink = (HtmlGenericControl)this.Master.FindControl("visibLink");
-                visibLink.Attributes.Add("class", "active");
+                
 
                 submitBtn.Visible = false;
                 backBtn.HRef = "tl_visibility.aspx";
@@ -166,8 +167,9 @@ public partial class new_visibility : System.Web.UI.Page
                 //}
 
                 surveyId = ((clsVisibilitySurvey)e.Item.DataItem).Id;
-                List<clsVisibilityResponse> responseList = DBLayer.getVisibilityResponseBySurveyId(surveyId);
-                childRepeater.DataSource = responseList;
+                //List<clsVisibilityResponse> responseList = DBLayer.getVisibilityResponseBySurveyId(surveyId);
+                //childRepeater.DataSource = responseList;
+                childRepeater.DataSource = ((clsVisibilitySurvey)e.Item.DataItem).Response;
                 //result += "standard: " + standardList.Count()+"</br>"; 
                 //result += "repeater: " + childRepeater.ID + "</br>"; 
                 childRepeater.DataBind();
@@ -458,6 +460,9 @@ public partial class new_visibility : System.Web.UI.Page
 
         //Response.Redirect("View_Visibility.aspx?pk=" + workplanId);
 
+        validationSummary.Text = message;
+        ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "showAlert();", true);
+
     }
 
     public bool ProcessMyDataItem(object myValue)
@@ -578,7 +583,8 @@ public partial class new_visibility : System.Web.UI.Page
             confirmParent.DataBind();
 
             validationSummary.Text = "";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "confirmModal();", true);
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "confirmModal()", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop2", "confirmModal()", true);
         }
     }
 
@@ -674,6 +680,8 @@ public partial class new_visibility : System.Web.UI.Page
     }
     protected void myFile_UploadedComplete(object sender, AsyncFileUploadEventArgs e)
     {
+        
+        ImageHandler imageHandler = new ImageHandler();
         string contentType = myFile.ContentType;
 
         clsUser user = (clsUser)Session["user"];
@@ -683,6 +691,11 @@ public partial class new_visibility : System.Web.UI.Page
         if (contentType.Equals("image/jpeg") || contentType.Equals("image/gif")
               || contentType.Equals("image/png") || contentType.Equals("image/jpg"))
         {
+            if (!ftpLayer.createDirectory("201701"))
+            {
+                ftpLayer.createDirectory("201701");
+            }
+
             string serverPath = Server.MapPath("~/Images/Temp");
             //System.IO.Directory.CreateDirectory(Server.MapPath("~/Images/Temp/"));
             var directory = System.IO.Directory.CreateDirectory(serverPath);
@@ -731,7 +744,12 @@ public partial class new_visibility : System.Web.UI.Page
             // Call the SaveAs method to save the uploaded
             // file to the specified directory.
             //FileUpload1.SaveAs(savePath);
-            myFile.SaveAs(Server.MapPath(savePath + fileName));
+            //Stream streamF = myFile.FileContent;
+            //Bitmap image = new Bitmap(streamF);
+            //myFile.SaveAs(Server.MapPath(savePath + fileName));
+
+            Bitmap bitmap = new Bitmap(myFile.FileContent);
+            imageHandler.Save(bitmap,1000,1000,75, Server.MapPath(savePath + fileName));
             oldpath = savePath + fileName;
             string file = Server.MapPath(savePath + fileName);
 
@@ -1156,7 +1174,21 @@ public partial class new_visibility : System.Web.UI.Page
             log.Activity = "submitted visib of visit::" + workplanId;
             DBLayer.addNewActivityLog(log);
         }  
-        Response.Redirect("View_Visibility.aspx?pk=" + workplanId);
+        //Response.Redirect("View_Visibility.aspx?pk=" + workplanId);
+        message += "<div id='myAlert' class='alert alert-success fade' role='alert'>";
+        message += "<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>";
+        message += "<p class='text-success'>Survey successfully submitted!</p>";
+        message += "</div>";
+
+        saveDraftBtn.Visible = false;
+        submitBtn.Visible = false;
+        statusBtn.Attributes.Add("class", "btn-success btn btn-sm");
+        statusBtn.InnerText = "Submitted";
+        statusBtn.Visible = true;
+
+        uploadBtnPlaceholder.Visible = false;
+        saveBtn.Visible = false;
+        cancelBtn.Visible = false;
     }
 
     protected DateTime GetCurrentTime()

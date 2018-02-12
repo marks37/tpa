@@ -96,6 +96,7 @@ public class clsVisibility
 		// TODO: Add constructor logic here
 		//
 	}
+
 }
 
 public class clsVisibilityStandard
@@ -238,6 +239,14 @@ public class clsVisibilitySurvey
     {
         get { return response; }
         set { response = value; }
+    }
+
+    private int response_count;
+
+    public int Response_count
+    {
+        get { return response_count; }
+        set { response_count = value; }
     }
 
     private string dateCreated;

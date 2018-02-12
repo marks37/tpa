@@ -17,10 +17,10 @@ public partial class admin_view_visibility : System.Web.UI.Page
     //Will user this later for saving visibility to db without querying data from db
     List<clsVisibility> visibilityList = new List<clsVisibility>();
     List<clsVisibilitySurvey> surveyList = new List<clsVisibilitySurvey>();
-    private Boolean workplanHasContent;
-    private List<clsVisibilityPicture> tempPictures;
-    private List<clsVisibilityPicture> savedPictures;
-    private List<clsVisibilityPicture> addedPictures;
+    //private Boolean workplanHasContent;
+    //private List<clsVisibilityPicture> tempPictures;
+    //private List<clsVisibilityPicture> savedPictures;
+    //private List<clsVisibilityPicture> addedPictures;
     protected void Page_Load(object sender, EventArgs e)
     {
         Page.Form.Attributes.Add("enctype", "multipart/form-data");
@@ -90,7 +90,7 @@ public partial class admin_view_visibility : System.Web.UI.Page
         {
 
             string result = "";
-            string visibilityId = "";
+            //string visibilityId = "";
             string surveyId = "";
             Repeater childRepeater = (Repeater)e.Item.FindControl("childRepeater");
             string workplanId = Request.QueryString["pk"];
@@ -1095,15 +1095,18 @@ public partial class admin_view_visibility : System.Web.UI.Page
             hit.Text = "";
 
             Label miss = (Label)e.Item.FindControl("miss");
-            if (response.Hit != null || !response.Hit.Equals(""))
+            if (response != null)
             {
                 hit.CssClass += "fa fa-check";
-            }
-            else if (response.Miss != null || !response.Miss.Equals(""))
-            {
-                //miss.Text = "<i class='fa fa-check'><i/>";
                 miss.CssClass += "fa fa-check";
             }
+            //if (response.Hit != null || !response.Hit.Equals(""))
+            //{
+            //}
+            //else if (response.Miss != null || !response.Miss.Equals(""))
+            //{
+            //    //miss.Text = "<i class='fa fa-check'><i/>";
+            //}
         }
     }
     protected void backBtn_Click(object sender, EventArgs e)

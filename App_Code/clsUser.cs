@@ -93,6 +93,14 @@ public class clsUser
         set { area = value; }
     }
 
+    private string teamleader;
+
+    public string Teamleader
+    {
+        get { return teamleader; }
+        set { teamleader = value; }
+    }
+
 	public clsUser()
 	{
 		//

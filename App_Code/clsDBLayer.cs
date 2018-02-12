@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Web;
 
 /// <summary>
 /// Summary description for clsDBLayer
@@ -23,6 +23,318 @@ public class clsDBLayer
 		//
 	}
 
+    //New Method
+    public clsUser getUserAccountById(string user_id)
+    {
+        clsUser user = new clsUser();
+
+        SqlConnection myConnection = new SqlConnection();
+        SqlCommand myCommand = new SqlCommand();
+
+        myConnection.ConnectionString = gConnString;
+        myCommand.Connection = myConnection;
+
+        myCommand.CommandType = System.Data.CommandType.Text;
+        myCommand.CommandText = @"SELECT [id]
+        ,[username]
+        ,[password]
+        ,[fullname]
+        ,[firstname]
+        ,[middle]
+        ,[lastname]
+        ,[type]
+        ,[area]
+        ,[is_active]
+        ,[email]
+        ,[team_leader]
+        FROM [DB_A1321A_visibsandbox].[dbo].[Ref_User]
+        WHERE [id] = @user_id";
+
+        myCommand.Parameters.Add("@user_id", System.Data.SqlDbType.VarChar);
+        myCommand.Parameters["@user_id"].Value = user_id;
+
+        try
+        {
+            myConnection.Open();
+            SqlDataReader myReader = myCommand.ExecuteReader();
+            while (myReader.Read())
+            {
+
+                user.Id = (myReader["id"] == null) ? string.Empty : myReader["id"].ToString();
+                user.Username = (myReader["username"] == null) ? string.Empty : myReader["username"].ToString();
+                user.Password = (myReader["password"] == null) ? string.Empty : myReader["password"].ToString();
+                user.Fullname = (myReader["fullname"] == null) ? string.Empty : myReader["fullname"].ToString();
+                user.Firstname = (myReader["firstname"] == null) ? string.Empty : myReader["firstname"].ToString();
+                user.MiddleName = (myReader["middle"] == null) ? string.Empty : myReader["middle"].ToString();
+                user.Lastname = (myReader["lastname"] == null) ? string.Empty : myReader["lastname"].ToString();
+                user.Type = (myReader["type"] == null) ? string.Empty : myReader["type"].ToString();
+                user.Type = (myReader["type"] == null) ? string.Empty : myReader["type"].ToString();
+            }
+            myReader.Close();
+
+        }
+        catch (Exception objExp)
+        {
+            throw objExp;
+        }
+        finally
+        {
+            if (myConnection != null && myConnection.State != System.Data.ConnectionState.Closed)
+            {
+                myConnection.Close();
+            }
+        }
+
+        return user;
+    }
+
+    //New Method
+    public List<clsUser> getAssignedUsers(string user_id)
+    {
+        List<clsUser> assignedUsers = new List<clsUser>();
+
+        SqlConnection myConnection = new SqlConnection();
+        SqlCommand myCommand = new SqlCommand();
+
+        myConnection.ConnectionString = gConnString;
+        myCommand.Connection = myConnection;
+
+        myCommand.CommandType = System.Data.CommandType.Text;
+        myCommand.CommandText = @"    DECLARE @Id int = @user_id
+    ;WITH cte AS 
+     (
+      SELECT 
+	  a.[id]
+      ,a.[username]
+      ,a.[password]
+      ,a.[fullname]
+      ,a.[firstname]
+      ,a.[middle]
+      ,a.[lastname]
+      ,a.[type]
+      ,a.[area]
+      ,a.[is_active]
+      ,a.[email]
+      ,a.[agency]
+      ,a.[team_leader]
+      FROM ref_user a
+      WHERE Id = @Id
+      UNION ALL
+      SELECT a.[id]
+      ,a.[username]
+      ,a.[password]
+      ,a.[fullname]
+      ,a.[firstname]
+      ,a.[middle]
+      ,a.[lastname]
+      ,a.[type]
+      ,a.[area]
+      ,a.[is_active]
+      ,a.[email]
+      ,a.[agency]
+      ,a.[team_leader]
+      FROM ref_user a JOIN cte c ON a.team_leader = c.id
+      )
+      SELECT *
+      FROM cte
+	  WHERE ID != @Id";
+
+        myCommand.Parameters.Add("@user_id", System.Data.SqlDbType.VarChar);
+        myCommand.Parameters["@user_id"].Value = user_id;
+
+        try
+        {
+            myConnection.Open();
+            SqlDataReader myReader = myCommand.ExecuteReader();
+            while (myReader.Read())
+            {
+                clsUser user = new clsUser();
+                user.Id = (myReader["id"] == null) ? string.Empty : myReader["id"].ToString();
+                user.Username = (myReader["username"] == null) ? string.Empty : myReader["username"].ToString();
+                user.Password = (myReader["password"] == null) ? string.Empty : myReader["password"].ToString();
+                user.Fullname = (myReader["fullname"] == null) ? string.Empty : myReader["fullname"].ToString();
+                user.Firstname = (myReader["firstname"] == null) ? string.Empty : myReader["firstname"].ToString();
+                user.MiddleName = (myReader["middle"] == null) ? string.Empty : myReader["middle"].ToString();
+                user.Lastname = (myReader["lastname"] == null) ? string.Empty : myReader["lastname"].ToString();
+                user.Teamleader = (myReader["team_leader"] == null) ? string.Empty : myReader["team_leader"].ToString();
+                user.Type = (myReader["type"] == null) ? string.Empty : myReader["type"].ToString();
+                assignedUsers.Add(user);
+            }
+            myReader.Close();
+
+        }
+        catch (Exception objExp)
+        {
+            throw objExp;
+        }
+        finally
+        {
+            if (myConnection != null && myConnection.State != System.Data.ConnectionState.Closed)
+            {
+                myConnection.Close();
+            }
+        }
+
+        return assignedUsers;
+    }
+
+    public DataTable getAssignedUsers2(string user_id)
+    {
+        //List<clsUser> assignedUsers = new List<clsUser>();
+
+        DataTable dt = null;
+
+        SqlConnection myConnection = new SqlConnection();
+        SqlCommand myCommand = new SqlCommand();
+
+        myConnection.ConnectionString = gConnString;
+        myCommand.Connection = myConnection;
+
+        myCommand.CommandType = System.Data.CommandType.Text;
+        myCommand.CommandText = @"    DECLARE @Id int = @user_id
+    ;WITH cte AS 
+     (
+      SELECT 
+	  a.[id]
+      ,a.[username]
+      ,a.[password]
+      ,a.[fullname]
+      ,a.[firstname]
+      ,a.[middle]
+      ,a.[lastname]
+      ,a.[type]
+      ,a.[area]
+      ,a.[is_active]
+      ,a.[email]
+      ,a.[agency]
+      ,a.[team_leader]
+      FROM ref_user a
+      WHERE Id = @Id
+      UNION ALL
+      SELECT a.[id]
+      ,a.[username]
+      ,a.[password]
+      ,a.[fullname]
+      ,a.[firstname]
+      ,a.[middle]
+      ,a.[lastname]
+      ,a.[type]
+      ,a.[area]
+      ,a.[is_active]
+      ,a.[email]
+      ,a.[agency]
+      ,a.[team_leader]
+      FROM ref_user a JOIN cte c ON a.team_leader = c.id
+      )
+      SELECT *
+      FROM cte
+	  WHERE ID != @Id";
+
+        myCommand.Parameters.Add("@user_id", System.Data.SqlDbType.VarChar);
+        myCommand.Parameters["@user_id"].Value = user_id;
+
+        SqlDataAdapter adapter = new SqlDataAdapter(myCommand);
+
+
+        try
+        {
+            myConnection.Open();
+            dt = new DataTable();
+            adapter.Fill(dt);
+            myConnection.Close();
+
+
+        }
+        catch (Exception objExp)
+        {
+            throw objExp;
+        }
+        finally
+        {
+            if (myConnection != null && myConnection.State != System.Data.ConnectionState.Closed)
+            {
+                myConnection.Close();
+            }
+        }
+
+        return dt;
+    }
+
+    public DataTable getAssignedUsers3(string user_id)
+    {
+        DataTable dt = null;
+        
+        SqlConnection myConnection = new SqlConnection();
+        SqlCommand myCommand = new SqlCommand();
+
+        myConnection.ConnectionString = gConnString;
+        myCommand.Connection = myConnection;
+
+        myCommand.CommandType = System.Data.CommandType.Text;
+        myCommand.CommandText = @"    DECLARE @Id int = @user_id
+    ;WITH cte AS 
+     (
+      SELECT 
+	  a.[id]
+      ,a.[username]
+      ,a.[password]
+      ,a.[fullname]
+      ,a.[firstname]
+      ,a.[middle]
+      ,a.[lastname]
+      ,a.[type]
+      ,a.[area]
+      ,a.[is_active]
+      ,a.[email]
+      ,a.[agency]
+      ,a.[team_leader]
+      FROM ref_user a
+      WHERE Id = @Id
+      UNION ALL
+      SELECT a.[id]
+      ,a.[username]
+      ,a.[password]
+      ,a.[fullname]
+      ,a.[firstname]
+      ,a.[middle]
+      ,a.[lastname]
+      ,a.[type]
+      ,a.[area]
+      ,a.[is_active]
+      ,a.[email]
+      ,a.[agency]
+      ,a.[team_leader]
+      FROM ref_user a JOIN cte c ON a.team_leader = c.id
+      )
+      SELECT *
+      FROM cte
+	  WHERE ID != @Id";
+
+        myCommand.Parameters.Add("@user_id", System.Data.SqlDbType.VarChar);
+        myCommand.Parameters["@user_id"].Value = user_id;
+
+        try
+        {
+            myConnection.Open();
+            dt = new DataTable();
+            dt.Load(myCommand.ExecuteReader());
+        }
+        catch (Exception objExp)
+        {
+            throw objExp;
+        }
+        finally
+        {
+            if (myConnection != null && myConnection.State != System.Data.ConnectionState.Closed)
+            {
+                myConnection.Close();
+            }
+        }
+
+        return dt;
+    }
+
+    //No diff
     public void changePassword(string password, string user_id)
     {
         SqlConnection myConnection = new SqlConnection();
@@ -61,6 +373,7 @@ public class clsDBLayer
         }
     }
 
+    //No diff    
     public DateTime GetCurrentTime()
     {
         DateTime serverTime = DateTime.Now;
@@ -68,6 +381,19 @@ public class clsDBLayer
         return _localTime;
     }
 
+    //public DateTime FirstDayOfQuarter(DateTime DateIn)
+    //{
+    //    int intQuarterNum = (DateIn.Month - 1) / 3 + 1;
+    //    return new DateTime(DateIn.Year, 3 * intQuarterNum - 2, 1);
+    //}
+
+    //public System.DateTime LastDayOfQuarter(System.DateTime DateIn)
+    //{
+    //    int intQuarterNum = (DateIn.Month - 1) / 3 + 1;
+    //    return new DateSerial(DateIn.Year, 3 * intQuarterNum + 1, 0);
+    //}
+
+    //No diff    
     public void addNewActivityLog(clsActivityLog log)
     {
         SqlConnection myConnection = new SqlConnection();
@@ -119,6 +445,7 @@ public class clsDBLayer
 
     }
 
+    //Modified
     public clsUser validateUser(string username, string password)
     {
         clsUser user = new clsUser();
@@ -130,19 +457,20 @@ public class clsDBLayer
         myCommand.Connection = myConnection;
 
         myCommand.CommandType = System.Data.CommandType.Text;
-        myCommand.CommandText = ("SELECT TOP 1000 [id] "+
-        ",[username] "+
-        ",[password] "+
-        ",[fullname] " +
-        ",[firstname] " +
-        ",[middle] " +
-        ",[lastname] "+
-        ",[type] "+
-        ",[area] " +
-        ",[is_active] " +
-        ",[email] " +
-        "FROM [DB_A1321A_visib].[dbo].[Ref_User] "+
-        "WHERE [username] = @username AND [password] = @password");
+        myCommand.CommandText = @"SELECT TOP 1000 [id]
+        ,[username]
+        ,[password]
+        ,[fullname]
+        ,[firstname]
+        ,[middle]
+        ,[lastname]
+        ,[type]
+        ,[area]
+        ,[is_active]
+        ,[email]
+        ,[team_leader]
+        FROM [DB_A1321A_visibsandbox].[dbo].[Ref_User]
+        WHERE [username] = @username AND [password] = @password";
 
         myCommand.Parameters.Add("@username", System.Data.SqlDbType.VarChar);
         myCommand.Parameters["@username"].Value = username;
@@ -163,6 +491,7 @@ public class clsDBLayer
                 user.Firstname = (myReader["firstname"] == null) ? string.Empty : myReader["firstname"].ToString();
                 user.MiddleName = (myReader["middle"] == null) ? string.Empty : myReader["middle"].ToString();
                 user.Lastname = (myReader["lastname"] == null) ? string.Empty : myReader["lastname"].ToString();
+                user.Teamleader = (myReader["team_leader"] == null) ? string.Empty : myReader["team_leader"].ToString();
                 user.Type = (myReader["type"] == null) ? string.Empty : myReader["type"].ToString();
             }
             myReader.Close();
@@ -183,6 +512,7 @@ public class clsDBLayer
         return user;
     }
 
+    //No diff
     public clsUser getUserAccountByUsername(string username)
     {
         clsUser user = new clsUser();
@@ -205,7 +535,7 @@ public class clsDBLayer
         ,[area]
         ,[is_active]
         ,[email]
-        FROM [DB_A1321A_visib].[dbo].[Ref_User]
+        FROM [DB_A1321A_visibsandbox].[dbo].[Ref_User]
         WHERE [username] = @username";
 
         myCommand.Parameters.Add("@username", System.Data.SqlDbType.VarChar);
@@ -245,6 +575,7 @@ public class clsDBLayer
         return user;
     }
 
+    //No diff
     public List<clsWorkplan> getAllWorkplans()
     {
         List<clsWorkplan> workplans = new List<clsWorkplan>();
@@ -270,9 +601,9 @@ public class clsDBLayer
         ",[status] " +
         ",[cds] " +
         ",[date_created] " +
-        "FROM [DB_A1321A_visib].[dbo].[Data_Workplan] as workplan " +
-        "JOIN [DB_A1321A_visib].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id " +
-        "JOIN [DB_A1321A_visib].[dbo].[Ref_User] as users on workplan.user_id = users.id " +
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] as workplan " +
+        "JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id " +
+        "JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_User] as users on workplan.user_id = users.id " +
         "WHERE [status] LIKE 'Submitted' ORDER BY workplan.[id] DESC");
 
         try
@@ -319,6 +650,7 @@ public class clsDBLayer
         return workplans;
     }
 
+    //No diff
     public List<clsWorkplan> getWorkplansTLViewByUserId(string userId)
     {
         List<clsWorkplan> workplans = new List<clsWorkplan>();
@@ -346,12 +678,12 @@ public class clsDBLayer
       ,[added_by]
       ,[reference]
       ,[viewed_at]
-FROM [DB_A1321A_visib].[dbo].[Data_Workplan] as workplan
+FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] as workplan
 INNER JOIN 
-(SELECT * FROM [DB_A1321A_visib].[dbo].[Ref_Manpower] WHERE user_id = @userId)
+(SELECT * FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Manpower] WHERE user_id = @userId)
  as manpower ON workplan.branch_id = manpower.branch_id
-LEFT JOIN [DB_A1321A_visib].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id
-LEFT JOIN [DB_A1321A_visib].[dbo].[Ref_User] as users on workplan.user_id = users.id 
+LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id
+LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_User] as users on workplan.user_id = users.id 
 ORDER BY date_created desc";
 
 //        @"SELECT workplan.[id]
@@ -371,10 +703,10 @@ ORDER BY date_created desc";
 //      ,[added_by]
 //      ,[reference]
 //      ,[viewed_at]
-//  FROM [DB_A1321A_visib].[dbo].[Data_Workplan] as workplan
-//  LEFT JOIN [DB_A1321A_visib].[dbo].[Ref_Manpower] as manpower ON workplan.branch_id = manpower.branch_id
-//  LEFT JOIN [DB_A1321A_visib].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id
-//  LEFT JOIN [DB_A1321A_visib].[dbo].[Ref_User] as users on workplan.user_id = users.id 
+//  FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] as workplan
+//  LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Manpower] as manpower ON workplan.branch_id = manpower.branch_id
+//  LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id
+//  LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_User] as users on workplan.user_id = users.id 
 //  WHERE manpower.user_id = @userId AND workplan.added_by = @userId AND reference like 'workplan'
 //  ORDER BY workplan.id desc";
 
@@ -423,6 +755,93 @@ ORDER BY date_created desc";
         return workplans;
     }
 
+    //New Method
+    public List<clsWorkplan> findMatchesWorkplan(clsWorkplan wkplan, DateTime minDate, DateTime maxDate)
+    {
+        List<clsWorkplan> workplans = new List<clsWorkplan>();
+        SqlConnection myConnection = new SqlConnection();
+        SqlCommand myCommand = new SqlCommand();
+
+        myConnection.ConnectionString = gConnString;
+        myCommand.Connection = myConnection;
+
+        myCommand.CommandType = System.Data.CommandType.Text;
+        myCommand.CommandText = @"SELECT workplan.[id]
+      ,[call_date]
+      ,workplan.[branch_id]
+      ,branch.[branch_name]
+      ,branch.[branch_code]
+	  ,branch.[account_group_1]
+      ,workplan.[is_deleted]
+      ,workplan.[user_id]
+      ,[firstname]
+      ,[lastname]
+      ,workplan.[status]
+      ,[date_created]
+      ,[date_submitted]
+      ,[deadline]
+      ,[added_by]
+      ,[reference]
+      ,[viewed_at]
+FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] as workplan
+LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id
+LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_User] as users on workplan.user_id = users.id
+WHERE user_id = @userId AND branch_id = @branchId AND ([call_date] BETWEEN @minDate AND @maxDate)
+ORDER BY date_created desc";
+
+        myCommand.Parameters.Add("@userId", System.Data.SqlDbType.Int);
+        myCommand.Parameters["@userId"].Value = wkplan.UserId;
+        myCommand.Parameters.Add("@branchId", System.Data.SqlDbType.Int);
+        myCommand.Parameters["@branchId"].Value = wkplan.BranchId;
+        myCommand.Parameters.Add("@minDate", System.Data.SqlDbType.DateTime);
+        myCommand.Parameters["@minDate"].Value = minDate;
+        myCommand.Parameters.Add("@maxDate", System.Data.SqlDbType.DateTime);
+        myCommand.Parameters["@maxDate"].Value = maxDate;
+
+
+        try
+        {
+            myConnection.Open();
+            SqlDataReader myReader = myCommand.ExecuteReader();
+            while (myReader.Read())
+            {
+
+                clsWorkplan workplan = new clsWorkplan();
+                workplan.Id = (myReader["id"] == null) ? string.Empty : myReader["id"].ToString();
+                workplan.CallDate = (myReader["call_date"] == null) ? string.Empty : myReader["call_date"].ToString();
+                workplan.BranchId = (myReader["branch_id"] == null) ? string.Empty : myReader["branch_id"].ToString();
+                workplan.AssignedBranch = getBranchById(workplan.BranchId);
+                workplan.IsDeleted = (myReader["is_deleted"] == null) ? string.Empty : myReader["is_deleted"].ToString();
+                workplan.UserId = (myReader["user_id"] == null) ? string.Empty : myReader["user_id"].ToString();
+                workplan.AssignedUser = getUserById(workplan.UserId);
+                workplan.Status = (myReader["status"] == null) ? string.Empty : myReader["status"].ToString();
+                workplan.DateCreated = (myReader["date_created"] == null) ? string.Empty : myReader["date_created"].ToString();
+                workplan.Deadline = (myReader["deadline"] == null) ? string.Empty : myReader["deadline"].ToString();
+                workplan.AddedBy = (myReader["added_by"] == null) ? string.Empty : myReader["added_by"].ToString();
+                workplan.Reference = (myReader["reference"] == null) ? string.Empty : myReader["reference"].ToString();
+                workplan.ViewedAt = (myReader["viewed_at"] == null) ? string.Empty : myReader["viewed_at"].ToString();
+                workplans.Add(workplan);
+
+            }
+            myReader.Close();
+
+        }
+        catch (Exception objExp)
+        {
+            throw objExp;
+        }
+        finally
+        {
+            if (myConnection != null && myConnection.State != System.Data.ConnectionState.Closed)
+            {
+                myConnection.Close();
+            }
+        }
+
+        return workplans;
+    }
+
+    // No diff
     public List<clsWorkplan> getWorkplansTLVisibilityByUserId(string userId)
     {
         List<clsWorkplan> workplans = new List<clsWorkplan>();
@@ -450,12 +869,12 @@ ORDER BY date_created desc";
       ,[added_by]
       ,[reference]
       ,[viewed_at]
-  FROM [DB_A1321A_visib].[dbo].[Data_Workplan] as workplan
+  FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] as workplan
   INNER JOIN 
-(SELECT * FROM [DB_A1321A_visib].[dbo].[Ref_Manpower] WHERE user_id = @userId)
+(SELECT * FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Manpower] WHERE user_id = @userId)
  as manpower ON workplan.branch_id = manpower.branch_id
-  LEFT JOIN [DB_A1321A_visib].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id
-  LEFT JOIN [DB_A1321A_visib].[dbo].[Ref_User] as users on workplan.user_id = users.id 
+  LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id
+  LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_User] as users on workplan.user_id = users.id 
   WHERE reference like 'workplan'
   AND (workplan.[status] LIKE 'For Approval' OR workplan.[status] LIKE 'Submitted')
   ORDER BY workplan.id desc";
@@ -505,6 +924,7 @@ ORDER BY date_created desc";
         return workplans;
     }
 
+    //No diff
     public List<clsWorkplan> getWorkplansByUserId(string userId)
     {
         List<clsWorkplan> workplans = new List<clsWorkplan>();
@@ -532,8 +952,8 @@ ORDER BY date_created desc";
         ",[added_by] " +
         ",[reference] " +
         ",[viewed_at] " +
-        "FROM [DB_A1321A_visib].[dbo].[Data_Workplan] as workplan "+
-        "JOIN [DB_A1321A_visib].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id "+
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] as workplan "+
+        "JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id "+
         "WHERE user_id = @userId ORDER BY workplan.[id] DESC");
 
         myCommand.Parameters.Add("@userId", System.Data.SqlDbType.Int);
@@ -582,6 +1002,7 @@ ORDER BY date_created desc";
         return workplans;
     }
 
+    //No diff
     public clsWorkplan getWorkplan(string workplanId)
     {
 
@@ -593,18 +1014,19 @@ ORDER BY date_created desc";
 
         myCommand.CommandType = System.Data.CommandType.Text;
         myCommand.CommandText = ("/****** Script for SelectTopNRows command from SSMS  ******/" +
-        "SELECT TOP 1000 workplan.[id] " +
+        "SELECT workplan.[id] " +
         ",[call_date] " +
         ",workplan.[branch_id] " +
         ",branch.[branch_name] " +
         ",branch.[account_group_1] " +
         ",branch.[branch_code] " +
+        ",deadline"+
         ",[is_deleted] " +
         ",[user_id] " +
         ",[status] " +
         ",[date_created] " +
-        "FROM [DB_A1321A_visib].[dbo].[Data_Workplan] as workplan " +
-        "JOIN [DB_A1321A_visib].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id " +
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] as workplan " +
+        "JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id " +
         "WHERE workplan.[id] = @id ");
 
         myCommand.Parameters.Add("@id", System.Data.SqlDbType.Int);
@@ -625,6 +1047,7 @@ ORDER BY date_created desc";
                 workplan.BranchId = (myReader["branch_id"] == null) ? string.Empty : myReader["branch_id"].ToString();
                 workplan.BranchName = (myReader["branch_name"] == null) ? string.Empty : myReader["branch_name"].ToString();
                 workplan.AccountCode = (myReader["branch_code"] == null) ? string.Empty : myReader["branch_code"].ToString();
+                workplan.Deadline = (myReader["deadline"] == null) ? string.Empty : myReader["deadline"].ToString();
                 workplan.AccountGroup = (myReader["account_group_1"] == null) ? string.Empty : myReader["account_group_1"].ToString();
                 workplan.IsDeleted = (myReader["is_deleted"] == null) ? string.Empty : myReader["is_deleted"].ToString();
                 workplan.UserId = (myReader["user_id"] == null) ? string.Empty : myReader["user_id"].ToString();
@@ -650,6 +1073,78 @@ ORDER BY date_created desc";
         return workplan;
     }
 
+    //New method
+    public clsWorkplan getCreatedWorkplan(string workplanId, string userId)
+    {
+        SqlConnection myConnection = new SqlConnection();
+        SqlCommand myCommand = new SqlCommand();
+
+        myConnection.ConnectionString = gConnString;
+        myCommand.Connection = myConnection;
+
+        myCommand.CommandType = System.Data.CommandType.Text;
+        myCommand.CommandText = ("/****** Script for SelectTopNRows command from SSMS  ******/" +
+        "SELECT workplan.[id] " +
+        ",[call_date] " +
+        ",workplan.[branch_id] " +
+        ",branch.[branch_name] " +
+        ",branch.[account_group_1] " +
+        ",branch.[branch_code] " +
+        ",deadline" +
+        ",[is_deleted] " +
+        ",[user_id] " +
+        ",[status] " +
+        ",[date_created] " +
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] as workplan " +
+        "JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id " +
+        "WHERE workplan.[id] = @id AND workplan.[added_by] = @userId");
+
+        myCommand.Parameters.Add("@id", System.Data.SqlDbType.Int);
+        myCommand.Parameters["@id"].Value = workplanId;
+        myCommand.Parameters.Add("@userId", System.Data.SqlDbType.Int);
+        myCommand.Parameters["@userId"].Value = userId;
+
+        clsWorkplan workplan = new clsWorkplan();
+        try
+        {
+            myConnection.Open();
+            SqlDataReader myReader = myCommand.ExecuteReader();
+            while (myReader.Read())
+            {
+
+                workplan.Id = (myReader["id"] == null) ? string.Empty : myReader["id"].ToString();
+                DateTime callDate = DateTime.Parse(myReader["call_date"].ToString());
+                workplan.CallDate = callDate.ToString("yyyy-MM-dd");
+                //workplan.CallDate = (myReader["call_date"] == null) ? string.Empty : myReader["call_date"].ToString();
+                workplan.BranchId = (myReader["branch_id"] == null) ? string.Empty : myReader["branch_id"].ToString();
+                workplan.BranchName = (myReader["branch_name"] == null) ? string.Empty : myReader["branch_name"].ToString();
+                workplan.AccountCode = (myReader["branch_code"] == null) ? string.Empty : myReader["branch_code"].ToString();
+                workplan.Deadline = (myReader["deadline"] == null) ? string.Empty : myReader["deadline"].ToString();
+                workplan.AccountGroup = (myReader["account_group_1"] == null) ? string.Empty : myReader["account_group_1"].ToString();
+                workplan.IsDeleted = (myReader["is_deleted"] == null) ? string.Empty : myReader["is_deleted"].ToString();
+                workplan.UserId = (myReader["user_id"] == null) ? string.Empty : myReader["user_id"].ToString();
+                workplan.Status = (myReader["status"] == null) ? string.Empty : myReader["status"].ToString();
+                workplan.DateCreated = (myReader["date_created"] == null) ? string.Empty : myReader["date_created"].ToString();
+
+            }
+            myReader.Close();
+
+        }
+        catch (Exception objExp)
+        {
+            throw objExp;
+        }
+        finally
+        {
+            if (myConnection != null && myConnection.State != System.Data.ConnectionState.Closed)
+            {
+                myConnection.Close();
+            }
+        }
+        return workplan;
+    }
+
+    //No diff
     public clsWorkplan viewWorkplan(string workplanId)
     {
         SqlConnection myConnection = new SqlConnection();
@@ -672,8 +1167,8 @@ ORDER BY date_created desc";
         ",[user_id] " +
         ",[status] " +
         ",[date_created] " +
-        "FROM [DB_A1321A_visib].[dbo].[Data_Workplan] as workplan " +
-        "JOIN [DB_A1321A_visib].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id " +
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] as workplan " +
+        "JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id " +
         "WHERE workplan.[id] = @id ");
 
         myCommand.Parameters.Add("@id", System.Data.SqlDbType.Int);
@@ -722,6 +1217,7 @@ ORDER BY date_created desc";
         return workplan;
     }
 
+    //No diff
     public string addWorkplan(clsWorkplan workplan)
     {
 
@@ -750,7 +1246,7 @@ ORDER BY date_created desc";
                    ",@added_by " +
                    ",@reference " +
                    ",@dateCreated) " +
-        "SELECT MAX([id]) as id FROM [DB_A1321A_visib].[dbo].[Data_Workplan] "+
+        "SELECT MAX([id]) as id FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] "+
         "WHERE [user_id] = @userId");
 
         myCommand.Parameters.Add("@callDate", System.Data.SqlDbType.NVarChar);
@@ -798,6 +1294,7 @@ ORDER BY date_created desc";
         return workplanId;
     }
 
+    //No diff
     public void editWorkplan(clsWorkplan workplan)
     {
         SqlConnection myConnection = new SqlConnection();
@@ -851,6 +1348,7 @@ ORDER BY date_created desc";
         }
     }
 
+    //No diff
     public string addVisibilitySurvey(clsVisibilitySurvey survey){
         string surveyId = "";
 
@@ -915,6 +1413,7 @@ ORDER BY date_created desc";
         return surveyId;
     }
 
+    //No diff
     public string addVisibilityResponse(clsVisibilityResponse response)
     {
         string responseId = "";
@@ -983,6 +1482,7 @@ ORDER BY date_created desc";
         return responseId;
     }
 
+    //No diff
     public List<clsVisibilitySurvey> getVisibilitySurveysByWorkplanId(string workplanId)
     {
         List<clsVisibilitySurvey> surveyList = new List<clsVisibilitySurvey>();
@@ -1004,8 +1504,8 @@ ORDER BY date_created desc";
         ,[qty]
         ,[workplan_id]
         ,survey.[date_created]
-        FROM [DB_A1321A_visib].[dbo].[Data_Visibility_Survey] as survey
-        JOIN [DB_A1321A_visib].[dbo].[Ref_Visibility_Program] as visibility 
+        FROM [DB_A1321A_visibsandbox].[dbo].[Data_Visibility_Survey] as survey
+        JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Visibility_Program] as visibility 
         ON survey.visibility_id = visibility.id
         WHERE [workplan_id] = @workplanId";
 
@@ -1032,6 +1532,7 @@ ORDER BY date_created desc";
                 survey.WorkplanId = (myReader["workplan_id"] == null) ? string.Empty : myReader["workplan_id"].ToString();
                 survey.DateCreated = (myReader["date_created"] == null) ? string.Empty : myReader["date_created"].ToString();
                 survey.Response = getVisibilityResponseBySurveyId(surveyId);
+                survey.Response_count = survey.Response.Count();
                 surveyList.Add(survey);
 
             }
@@ -1053,6 +1554,7 @@ ORDER BY date_created desc";
         return surveyList;
     }
 
+    //No diff
     public List<clsVisibilityResponse> getVisibilityResponseBySurveyId(string surveyId)
     {
         List<clsVisibilityResponse> responseList = new List<clsVisibilityResponse>();
@@ -1076,8 +1578,8 @@ ORDER BY date_created desc";
         ,[miss]
         ,[miss_category]
         ,response.[date_created]
-        FROM [DB_A1321A_visib].[dbo].[Data_Visibility_Response] as response
-        JOIN [DB_A1321A_visib].[dbo].[Ref_Visibility_Standard] as measure
+        FROM [DB_A1321A_visibsandbox].[dbo].[Data_Visibility_Response] as response
+        JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Visibility_Standard] as measure
         ON measure.id = response.standard
         WHERE [visibility_survey_id] = @surveyId
         ORDER BY NAME ASC";
@@ -1125,6 +1627,7 @@ ORDER BY date_created desc";
         return responseList;
     }
 
+    //No diff
     public List<clsVisibility> getVisibilityProgramsByBranchId(string branchId)
     {
         List<clsVisibility> visibilityList = new List<clsVisibility>();
@@ -1144,9 +1647,9 @@ ORDER BY date_created desc";
 	    ",visibility.[description] "+
 	    ",visibility.[display_type] "+
 	    ",visibility.[qty] "+
-        "FROM [DB_A1321A_visib].[dbo].[Ref_Visibility_Branch] as assignedBranches "+
-        "JOIN [DB_A1321A_visib].[dbo].[Ref_Branch] as branches ON assignedBranches.branch_id = branches.id "+
-        "JOIN [DB_A1321A_visib].[dbo].[Ref_Visibility_Program] as  visibility ON assignedBranches.visibility_id  = visibility.id "+
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Visibility_Branch] as assignedBranches "+
+        "JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branches ON assignedBranches.branch_id = branches.id "+
+        "JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Visibility_Program] as  visibility ON assignedBranches.visibility_id  = visibility.id "+
         "WHERE assignedBranches.[branch_id] = @branchId");
 
         myCommand.Parameters.Add("@branchId", System.Data.SqlDbType.Int);
@@ -1192,6 +1695,7 @@ ORDER BY date_created desc";
         return visibilityList;
     }
 
+    //No diff
     public List<clsVisibilityStandard> getVisibilityStandardByVisibilityId(string visibilityId)
     {
         List<clsVisibilityStandard> standardList = new List<clsVisibilityStandard>();
@@ -1207,7 +1711,7 @@ ORDER BY date_created desc";
         ",[name] "+
         ",[description] "+
         ",[visibility_id] "+
-        "FROM [DB_A1321A_visib].[dbo].[Ref_Visibility_Standard] "+
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Visibility_Standard] "+
         "WHERE [visibility_id] = @visibilityId");
 
         myCommand.Parameters.Add("@visibilityId", System.Data.SqlDbType.Int);
@@ -1247,6 +1751,7 @@ ORDER BY date_created desc";
         return standardList;
     }
 
+    //No diff
     public List<clsManpower> getAssignedBranches(string userId)
     {
         List<clsManpower> assignedBranches = new List<clsManpower>();
@@ -1258,14 +1763,14 @@ ORDER BY date_created desc";
         myCommand.Connection = myConnection;
 
         myCommand.CommandType = System.Data.CommandType.Text;
-        myCommand.CommandText = ("SELECT TOP 1000 manpower.[id] "+
+        myCommand.CommandText = ("SELECT manpower.[id] "+
         ",[user_id] "+
         ",manpower.[branch_id] "+
         ",(convert(nvarchar,[branch_code]) +' '+ [account_group_1] +' '+[branch_name]) as branch_name " +
         ",[status] "+
         ",[is_deleted] "+
-        "FROM [DB_A1321A_visib].[dbo].[Ref_Manpower] as manpower "+
-        "join [DB_A1321A_visib].[dbo].[Ref_Branch] as branch on manpower.branch_id = branch.id " +
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Manpower] as manpower "+
+        "join [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on manpower.branch_id = branch.id " +
         "WHERE user_id = @userId ");
 
         myCommand.Parameters.Add("@userId", System.Data.SqlDbType.Int);
@@ -1306,6 +1811,60 @@ ORDER BY date_created desc";
         return assignedBranches;
     }
 
+    //New method
+    public List<clsBranch> getAssignedBranchesByUserId(string userId)
+    {
+        List<clsBranch> assignedBranches = new List<clsBranch>();
+
+        SqlConnection myConnection = new SqlConnection();
+        SqlCommand myCommand = new SqlCommand();
+
+        myConnection.ConnectionString = gConnString;
+        myCommand.Connection = myConnection;
+
+        myCommand.CommandType = System.Data.CommandType.Text;
+        myCommand.CommandText = @"  SELECT B.id as branch_id, B.account_group_1, B.branch_code, B.branch_name, B.branch_address
+  FROM [Ref_Manpower] A
+  LEFT JOIN [Ref_Branch] B ON A.[branch_id] = B.[id]
+  INNER JOIN (SELECT DISTINCT branch_id FROM [Ref_Visibility_branch]) C ON B.id = C.branch_id
+  WHERE A.[user_id] = @userId ORDER BY B.account_group_1, B.id";
+
+        myCommand.Parameters.Add("@userId", System.Data.SqlDbType.Int);
+        myCommand.Parameters["@userId"].Value = userId;
+
+        try
+        {
+            myConnection.Open();
+            SqlDataReader myReader = myCommand.ExecuteReader();
+            while (myReader.Read())
+            {
+                clsBranch branch = new clsBranch();
+                branch.BranchId = (myReader["branch_id"] == null) ? string.Empty : myReader["branch_id"].ToString();
+                branch.BranchName = (myReader["branch_name"] == null) ? string.Empty : myReader["branch_name"].ToString();
+                branch.BranchCode = (myReader["branch_code"] == null) ? string.Empty : myReader["branch_code"].ToString();
+                branch.BranchAddress = (myReader["branch_address"] == null) ? string.Empty : myReader["branch_address"].ToString();
+                branch.Account_group_1 = (myReader["account_group_1"] == null) ? string.Empty : myReader["account_group_1"].ToString();
+                assignedBranches.Add(branch);
+            }
+            myReader.Close();
+
+        }
+        catch (Exception objExp)
+        {
+            throw objExp;
+        }
+        finally
+        {
+            if (myConnection != null && myConnection.State != System.Data.ConnectionState.Closed)
+            {
+                myConnection.Close();
+            }
+        }
+
+        return assignedBranches;
+    }
+
+    //No diff
     public List<clsManpower> getAssignedBranchesTLViewByUserId(string userId, clsManpower filter)
     {
         List<clsManpower> assignedBranches = new List<clsManpower>();
@@ -1342,13 +1901,13 @@ ORDER BY date_created desc";
 //      ,coordinator.[branch_id]
 //      ,coordinator.[status]
 //      ,coordinator.[is_deleted]
-//  FROM [DB_A1321A_visib].[dbo].[Ref_Manpower] as coordinator
+//  FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Manpower] as coordinator
 //  RIGHT JOIN (SELECT [id]
 //      ,[user_id]
 //      ,[branch_id]
 //      ,[status]
 //      ,[is_deleted]
-//  FROM [DB_A1321A_visib].[dbo].[Ref_Manpower]
+//  FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Manpower]
 //  WHERE user_id = @userId) as team_leader ON team_leader.branch_id = coordinator.branch_id
 //  WHERE coordinator.user_id != @userId";
 
@@ -1407,6 +1966,7 @@ ORDER BY date_created desc";
         return assignedBranches;
     }
 
+    //No diff
     public clsManpower getManpowerById(string id)
     {
         clsManpower manpower = new clsManpower();
@@ -1423,7 +1983,7 @@ ORDER BY date_created desc";
       ,[branch_id]
       ,[status]
       ,[is_deleted]
-      FROM [DB_A1321A_visib].[dbo].[Ref_Manpower]
+      FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Manpower]
       WHERE id = @id";
 
         myCommand.Parameters.Add("@id", System.Data.SqlDbType.Int);
@@ -1462,6 +2022,7 @@ ORDER BY date_created desc";
         return manpower;
     }
 
+    //No diff
     public void updateVisibilityResponseById(clsVisibilityResponse response)
     {
      
@@ -1508,6 +2069,7 @@ ORDER BY date_created desc";
         }
     }
 
+    //No diff
     public void updateVisibilitySurveyById(clsVisibilitySurvey survey)
     {
         foreach (clsVisibilityResponse response in survey.Response)
@@ -1516,6 +2078,7 @@ ORDER BY date_created desc";
         }
     }
     
+    //No diff
     public void changeWorkplanStatus(clsWorkplan workplan){
         SqlConnection myConnection = new SqlConnection();
         SqlCommand myCommand = new SqlCommand();
@@ -1553,6 +2116,7 @@ ORDER BY date_created desc";
         }
     }
 
+    //No diff
     public List<clsVisibility> getVisibilityPrograms()
     {
         List<clsVisibility> visibilityList = new List<clsVisibility>();
@@ -1571,7 +2135,7 @@ ORDER BY date_created desc";
         ",[description] "+
         ",[display_type] "+
         ",[qty] "+
-        "FROM [DB_A1321A_visib].[dbo].[Ref_Visibility_Program]");
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Visibility_Program]");
 
         try
         {
@@ -1611,6 +2175,7 @@ ORDER BY date_created desc";
         return visibilityList;
     }
 
+    //No diff
     public List<clsVisibilityPicture> getPicturesByResponseId(string responseId)
     {
         List<clsVisibilityPicture> visibPictures = new List<clsVisibilityPicture>();
@@ -1633,7 +2198,7 @@ ORDER BY date_created desc";
         ",[remarks] "+
         ",[brands] "+
         ",[response_id] "+
-        "FROM [DB_A1321A_visib].[dbo].[Data_Visibility_Picture] "+
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Data_Visibility_Picture] "+
         "WHERE [response_id] = @responseId");
 
         myCommand.Parameters.Add("@responseId", System.Data.SqlDbType.Int);
@@ -1673,6 +2238,7 @@ ORDER BY date_created desc";
         return visibPictures;
     }
 
+    //No diff
     public List<clsVisibilityPicture> getVisibilityPicturesByResponseId(string responseId)
     {
         List<clsVisibilityPicture> pictureList = new List<clsVisibilityPicture>();
@@ -1698,7 +2264,7 @@ ORDER BY date_created desc";
         ",[file_name] " +
         ",[file_path] " +
         ",[shelf_id] " +
-        "FROM [DB_A1321A_visib].[dbo].[Data_Visibility_Picture] "+
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Data_Visibility_Picture] "+
         "WHERE [response_id] = @responseId ORDER BY [id] DESC");
 
         myCommand.Parameters.Add("@responseId", System.Data.SqlDbType.Int);
@@ -1745,6 +2311,7 @@ ORDER BY date_created desc";
         return pictureList;
     }
 
+    //No diff
     public clsVisibilityPicture getVisibilityPictureById(string picId)
     {
         clsVisibilityPicture picture = new clsVisibilityPicture();
@@ -1770,7 +2337,7 @@ ORDER BY date_created desc";
         ",[file_name] " +
         ",[file_path] " +
         ",[shelf_id] " +
-        "FROM [DB_A1321A_visib].[dbo].[Data_Visibility_Picture] " +
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Data_Visibility_Picture] " +
         "WHERE [id] = @picId ORDER BY [id] DESC");
 
         myCommand.Parameters.Add("@picId", System.Data.SqlDbType.Int);
@@ -1815,6 +2382,7 @@ ORDER BY date_created desc";
         return picture;
     }
 
+    //No diff
     public void addVisibilityPicturesByResponseId(clsVisibilityPicture picture)
     {
         //string surveyId = "";
@@ -1888,6 +2456,7 @@ ORDER BY date_created desc";
         //return surveyId;
     } 
 
+    //No diff
     public clsVisibilitySurvey getVisibilitySurveyBySurveyId(string surveyId){
         clsVisibilitySurvey survey = new clsVisibilitySurvey();
         SqlConnection myConnection = new SqlConnection();
@@ -1907,8 +2476,8 @@ ORDER BY date_created desc";
         ",[qty] " +
         ",[workplan_id] " +
         ",survey.[date_created] " +
-        "FROM [DB_A1321A_visib].[dbo].[Data_Visibility_Survey] as survey " +
-        "JOIN [DB_A1321A_visib].[dbo].[Ref_Visibility_Program] as visibility " +
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Data_Visibility_Survey] as survey " +
+        "JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Visibility_Program] as visibility " +
         "ON survey.visibility_id = visibility.id " +
         "WHERE survey.[id] = @surveyId");
 
@@ -1952,6 +2521,7 @@ ORDER BY date_created desc";
         return survey;
     }
 
+    //No diff
     public clsVisibilityResponse getVisibilityResponseByResponseId(string responseId)
     {
         clsVisibilityResponse response = new clsVisibilityResponse();
@@ -1975,8 +2545,8 @@ ORDER BY date_created desc";
         ,[miss]
         ,[miss_category]
         ,response.[date_created]
-        FROM [DB_A1321A_visib].[dbo].[Data_Visibility_Response] as response
-        JOIN [DB_A1321A_visib].[dbo].[Ref_Visibility_Standard] as measure
+        FROM [DB_A1321A_visibsandbox].[dbo].[Data_Visibility_Response] as response
+        JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Visibility_Standard] as measure
         ON measure.id = response.standard
         WHERE response.[id] = @responseId";
 
@@ -2017,6 +2587,7 @@ ORDER BY date_created desc";
         return response;
     }
 
+    //No diff
     public void removeVisibilityPictureById(string pictureId)
     {
         SqlConnection myConnection = new SqlConnection();
@@ -2051,6 +2622,7 @@ ORDER BY date_created desc";
         }
     }
 
+    //No diff
     public void clearTempVisibilityPicturesByResponseId(string responseId)
     {
         SqlConnection myConnection = new SqlConnection();
@@ -2084,7 +2656,7 @@ ORDER BY date_created desc";
         }
     }
 
-
+    //No diff
     public List<clsVisibilityShelfBrand> getShelfBrandList()
     {
         List<clsVisibilityShelfBrand> shelfList = new List<clsVisibilityShelfBrand>();
@@ -2099,7 +2671,7 @@ ORDER BY date_created desc";
         myCommand.CommandText = ("SELECT TOP 1000 [id] "+
         ",[shelf_brand_code] "+
         ",[description] "+
-        "FROM [DB_A1321A_visib].[dbo].[Ref_Visibility_Shelf]");
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Visibility_Shelf]");
 
         try
         {
@@ -2131,6 +2703,7 @@ ORDER BY date_created desc";
         return shelfList;
     }
 
+    //No diff
     public void updateVisibilityPictureById(clsVisibilityPicture picture)
     {
         SqlConnection myConnection = new SqlConnection();
@@ -2178,6 +2751,7 @@ ORDER BY date_created desc";
         }
     }
 
+    //No diff
     public clsVisibilityShelfBrand getShelfBrand(string shelfId)
     {
         clsVisibilityShelfBrand shelf = new clsVisibilityShelfBrand();
@@ -2192,7 +2766,7 @@ ORDER BY date_created desc";
         myCommand.CommandText = ("SELECT TOP 1000 [id] " +
         ",[shelf_brand_code] " +
         ",[description] " +
-        "FROM [DB_A1321A_visib].[dbo].[Ref_Visibility_Shelf] where [id] = @shelfId");
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Visibility_Shelf] where [id] = @shelfId");
 
         myCommand.Parameters.Add("@shelfId", System.Data.SqlDbType.NVarChar);
         
@@ -2226,6 +2800,7 @@ ORDER BY date_created desc";
         return shelf;
     }
 
+    //No diff
     public List<clsUser> getAllUsers()
     {
         List<clsUser> users = new List<clsUser>();
@@ -2246,7 +2821,7 @@ ORDER BY date_created desc";
         ",[area] "+
         ",[is_active] "+
         ",[email] "+
-        "FROM [DB_A1321A_visib].[dbo].[Ref_User]");
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Ref_User]");
 
         try
         {
@@ -2285,6 +2860,7 @@ ORDER BY date_created desc";
         return users;
     }
 
+    //No diff
     public clsBranch getBranchById(string branchId)
     {
         clsBranch branch = new clsBranch();
@@ -2311,7 +2887,7 @@ ORDER BY date_created desc";
       ,[remarks]
       ,[team_leader]
       ,[cds]
-  FROM [DB_A1321A_visib].[dbo].[Ref_Branch]
+  FROM [DB_A1321A_visibsandbox].[dbo].[Ref_Branch]
   WHERE id = @branchId";
 
         myCommand.Parameters.Add("@branchId", System.Data.SqlDbType.NVarChar);
@@ -2348,6 +2924,7 @@ ORDER BY date_created desc";
         return branch;
     }
 
+    //No diff
     public clsUser getUserById(string userId)
     {
         clsUser user = new clsUser();
@@ -2370,7 +2947,7 @@ ORDER BY date_created desc";
         ",[area] " +
         ",[is_active] " +
         ",[email] " +
-        "FROM [DB_A1321A_visib].[dbo].[Ref_User] " +
+        "FROM [DB_A1321A_visibsandbox].[dbo].[Ref_User] " +
         "WHERE id = @userId");
 
         myCommand.Parameters.Add("@userId", System.Data.SqlDbType.VarChar);
@@ -2409,4 +2986,60 @@ ORDER BY date_created desc";
 
         return user;
     }
+
+    //New method
+    public clsUser getAssignedUserByBranchId(string branchId)
+    {
+        clsUser assignedUser = new clsUser();
+
+        SqlConnection myConnection = new SqlConnection();
+        SqlCommand myCommand = new SqlCommand();
+
+        myConnection.ConnectionString = gConnString;
+        myCommand.Connection = myConnection;
+
+        myCommand.CommandType = System.Data.CommandType.Text;
+        myCommand.CommandText = @"SELECT B.id
+        ,B.fullname
+        ,B.firstname
+        ,B.lastname
+          FROM [DB_A1321A_visibsandbox]..[Ref_Manpower] A
+          LEFT JOIN [DB_A1321A_visibsandbox]..[Ref_User] B
+          ON A.user_id = B.id
+          WHERE (B.type = 'Promo Rep' OR B.type = 'Coordinator')
+          AND branch_id = @branchId";
+
+        myCommand.Parameters.Add("@branchId", System.Data.SqlDbType.VarChar);
+        myCommand.Parameters["@branchId"].Value = branchId;
+
+        try
+        {
+            myConnection.Open();
+            SqlDataReader myReader = myCommand.ExecuteReader();
+            while (myReader.Read())
+            {
+                assignedUser.Id = (myReader["id"] == null) ? string.Empty : myReader["id"].ToString();
+                assignedUser.Fullname = (myReader["fullname"] == null) ? string.Empty : myReader["fullname"].ToString();
+                assignedUser.Firstname = (myReader["firstname"] == null) ? string.Empty : myReader["firstname"].ToString();
+                assignedUser.Lastname = (myReader["lastname"] == null) ? string.Empty : myReader["lastname"].ToString();
+            }
+            myReader.Close();
+
+        }
+        catch (Exception objExp)
+        {
+            throw objExp;
+        }
+        finally
+        {
+            if (myConnection != null && myConnection.State != System.Data.ConnectionState.Closed)
+            {
+                myConnection.Close();
+            }
+        }
+
+        return assignedUser;
+    }
+
+
 } 

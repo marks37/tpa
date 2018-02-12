@@ -1,7 +1,15 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/VisibilityMain.master" AutoEventWireup="true" CodeFile="tl_workplan.aspx.cs" Inherits="tl_workplan" %>
 
+<%@ Register Assembly="DevExpress.Web.v17.1, Version=17.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Data.Linq" TagPrefix="dx" %>
+
+<%@ Register Assembly="DevExpress.Web.v17.1, Version=17.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Web" TagPrefix="dx" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <style>
+        .control-label {
+            /*font-weight: 500;*/
+        }
+
         dl {
             margin-bottom: 0;
             font-size: 14px;
@@ -17,6 +25,11 @@
         dd {
             font-weight: normal;
             color: rgba(0,0,0,0.80);
+        }
+
+
+        .form-horizontal .control-label.text-left {
+            text-align: left;
         }
 
         .test-tbl thead tr th:first-child {
@@ -57,20 +70,24 @@
             padding-bottom: 10px;
         }
 
-        .table {
+        #workplans {
             /*border-bottom: 1px solid #ddd;*/
             border: 1px solid #ddd;
             background-color: #fff;
         }
 
-        table.dataTable {
-            /*margin-top:5px;*/
-            /*margin-top: 0px !important;*/
-            /*border-bottom: 0px solid #ddd;*/
-            /*margin-bottom: 5px !important;*/
+            #workplans.dataTable {
+                /*margin-top:5px;*/
+                /*margin-top: 0px !important;*/
+                /*border-bottom: 0px solid #ddd;*/
+                /*margin-bottom: 5px !important;*/
+            }
+
+        #branches_tbl > tbody > tr > td {
+            vertical-align: middle;
         }
 
-        .table > thead > tr > th {
+        #workplans > thead > tr > th {
             font-weight: 600;
             line-height: 25px;
             border-bottom-width: 1px;
@@ -88,7 +105,7 @@
 
         .select2-container {
             width: 100% !important;
-            padding: 0;
+            /*padding: 0;*/
         }
 
         .lower-navbar-wrapper {
@@ -107,6 +124,10 @@
 
         body {
         }
+
+        .select2-container--bootstrap .select2-results > .select2-results__options {
+            max-height: 400px;
+        }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
@@ -117,274 +138,254 @@
                 <div class="btn-group hidden" role="group">
                     <a class="btn btn-default btn-sm">Workplan</a>
                 </div>
-                <%--<div class="btn-group" role="group">
-                    <a class="btn btn-default btn-sm">March <span class="caret"></span></a>
-                </div>--%>
             </div>
             <div class="pull-right">
                 <div class="" role="toolbar" id="toolbar">
-                    <%--<div class="btn-group" role="group">
-                        <a class="btn btn-default btn-sm">Branch: All</a>
-                    </div>
-                    &nbsp;
                     <div class="btn-group" role="group">
-                        <a class="btn btn-default btn-sm">Coordinator: All</a>
+                        <asp:Button ID="newVisitBtn" runat="server" Text="New Visit" CssClass="new-visit-btn btn  btn-success btn-sm" OnClick="newVisitBtn_Click" />
                     </div>
-                    &nbsp;
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-default btn-sm">Branch: All</a>
-                    </div>
-                    &nbsp;
-                    <div class="btn-group" role="group">
-                        <asp:LinkButton ID="prevBtn" CssClass="btn btn-sm btn-default disabled" runat="server"><span class="fa fa-chevron-left text-muted"></span></asp:LinkButton>
-                        <asp:LinkButton ID="nextBtn" CssClass="btn btn-sm btn-default disabled" runat="server"><span class="fa fa-chevron-right text-muted"></span></asp:LinkButton>
-                    </div>
-                    &nbsp;--%>
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">New Visit</a>
-                        <%--<a class="btn btn-default btn-sm" href="tl_new_workplan.aspx">New Workplan</a>--%>
-                    </div>
-                    <%--&nbsp;
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-default btn-sm" data-toggle="modal" data-target="#myModal">Import</a>
-                    </div>--%>
                 </div>
             </div>
             <div class="clearfix"></div>
         </div>
     </div>
 
-    <asp:UpdatePanel ID="UpdatePanel2" runat="server" UpdateMode="Conditional">
-        <ContentTemplate>
-            <div id="main-content-wrapper">
-                <div class="">
-                    <br />
-                    <div class="container-fluid">
-                        <asp:Label ID="messagelbl" runat="server" Text=""></asp:Label>
-                        <div class="">
-                            <h3 class="hidden" style="margin-left: 10px;">Workplan</h3>
-                            <table class="table table-condensed table-hover test-tbl" id="workplans">
-                                <thead>
-                                    <tr class="">
-                                        <th></th>
-                                        <th class="text-muted small">Branch</th>
-                                        <th class="text-muted small text-center">Call Date</th>
-                                        <th class="text-muted small text-center">Due Date</th>
-                                        <th class="text-muted small">Coordinator</th>
-                                        <th class="text-muted small text-center">Date Added</th>
-                                        <th class="text-muted text-right"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <asp:Repeater ID="workplan_rptr" runat="server" OnItemDataBound="workplan_rptr_ItemDataBound" OnItemCommand="workplan_rptr_ItemCommand">
-                                        <ItemTemplate>
-                                            <tr class="">
-                                                <td>
-                                                    <asp:Label ID="lock" runat="server"></asp:Label>
-                                                </td>
-                                                <td class="">
-                                                    <asp:Label ID="branchlbl" CssClass="" runat="server" Text=""></asp:Label>
-                                                </td>
-                                                <td class="text-center">
-                                                    <asp:Label ID="calldatelbl" runat="server" Text=""></asp:Label>
-                                                </td>
-                                                <td class="text-center">
-                                                    <asp:Label ID="deadlinelbl" runat="server" Text=""></asp:Label>
 
-                                                </td>
-                                                <td class="">
-                                                    <asp:Label ID="coordinatorlbl" runat="server" Text=""></asp:Label>
-                                                </td>
-                                                <td class="text-center">
-                                                    <asp:Label ID="dateAddedlbl" runat="server" Text=""></asp:Label>
-                                                </td>
-                                                <td class="text-center">
-                                                    <div class="btn-group">
-                                                        <asp:LinkButton ID="viewBtn" CssClass="btn-link btn" runat="server" CommandName="edit" CommandArgument='<%# Eval("id") %>'>Edit</asp:LinkButton>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </ItemTemplate>
-                                    </asp:Repeater>
-                                </tbody>
-                            </table>
+    <div id="main-content-wrapper">
+        <div class="">
+            <br />
+            <div class="container-fluid">
+                <asp:Label ID="messagelbl" runat="server" Text=""></asp:Label>
+                <asp:UpdatePanel ID="UpdatePanel2" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
 
-                            <div class="hidden">
-                                <h4 class="hidden">Month & Assigned View</h4>
-                                <table class="hidden table table-hover table-striped test-tbl">
-                                    <thead>
-                                        <tr>
-                                            <th class="small text-muted">#</th>
-                                            <th class="small text-muted">Period</th>
-                                            <th class="small text-muted">Team Leader</th>
-                                            <th class="small text-muted text-center">Date Created</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><a>WPN:000008</a></td>
-                                            <td><a>March 2017</a></td>
-                                            <td>Mary Jane Alejo</td>
-                                            <td class="text-center">02.27.2017</td>
-                                        </tr>
-                                        <tr>
-                                            <td><a>7</a></td>
-                                            <td><a>March 2017</a></td>
-                                            <td><a>Jon Alinea</a></td>
-                                            <td class="text-center">02.27.2017</td>
-                                        </tr>
-                                        <tr>
-                                            <td><a>6</a></td>
-                                            <td><a>March 2017</a></td>
-                                            <td><a>Ysma Angeles</a></td>
-                                            <td class="text-center">02.27.2017</td>
-                                        </tr>
-                                        <tr>
-                                            <td><a>5</a></td>
-                                            <td><a>March 2017</a></td>
-                                            <td><a>Arnel Detablan</a></td>
-                                            <td class="text-center">02.27.2017</td>
-                                        </tr>
-                                        <tr>
-                                            <td><a>4</a></td>
-                                            <td><a>Februrary 2017</a></td>
-                                            <td><a>Mary Jane Alejo</a></td>
-                                            <td class="text-center">02.27.2017</td>
-                                        </tr>
-                                        <tr>
-                                            <td><a>3</a></td>
-                                            <td><a>Februrary 2017</a></td>
-                                            <td><a>Jon Alinea</a></td>
-                                            <td class="text-center">02.27.2017</td>
-                                        </tr>
-                                        <tr>
-                                            <td><a>2</a></td>
-                                            <td><a>Februrary 2017</a></td>
-                                            <td><a>Ysma Angeles</a></td>
-                                            <td class="text-center">02.27.2017</td>
-                                        </tr>
-                                        <tr>
-                                            <td><a>1</a></td>
-                                            <td><a>Februrary 2017</a></td>
-                                            <td><a>Arnel Detablan</a></td>
-                                            <td class="text-center">02.27.2017</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
 
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="hidden panel panel-default">
-                        <h4 class="hidden">Month View only</h4>
-                        <table class="table table-hover table-striped test-tbl">
-                            <thead>
-                                <tr>
-                                    <th class="text-muted small">Period</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><a>March 2017</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a>February 2017</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a>January 2017</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a>December 2016</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a>November 2016</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a>October 2016</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="hidden panel panel-default">
-                        <h4 class="hidden">Coordinator only</h4>
-                        <table class="table table-hover table-striped test-tbl">
-                            <thead>
-                                <tr>
-                                    <th class="text-muted small">Coordinator</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><a>Mary Jane Alejo</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a>Mariebel toledo</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a>Ronaldo Bringino</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-
-                <footer class="">
-                    <br />
-                    <br />
-                    <div class="container-fluid">
-                        <p class="text-muted text-right">Developed by: <a href="#">BSDGSYS</a>. 2017</p>
-                    </div>
-                    <br />
-                </footer>
-            </div>
-        </ContentTemplate>
-        <Triggers>
-            <asp:AsyncPostBackTrigger ControlID="submitBtn" />
-            <asp:AsyncPostBackTrigger ControlID="submitEditBtn" />
-        </Triggers>
-    </asp:UpdatePanel>
-
-    <%--Edit Modal--%>
-    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModal">
-        <div class="modal-dialog" role="document">
-            <asp:UpdatePanel ID="UpdatePanel3" runat="server">
-                <ContentTemplate>
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title"><i class="fa fa-pencil"></i>&nbsp;Edit Visit</h4>
-                            <asp:HiddenField ID="workplanID" runat="server" />
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
+                        <dx:EntityServerModeDataSource runat="server" ID="EntityServerModeDataSource1" ContextTypeName="Entities" OnSelecting="EntityServerModeDataSource1_Selecting" TableName="vw_data_workplan_tl"></dx:EntityServerModeDataSource>
+                        
+                        <div class="form-horizontal">
+                            <div class="form-group">
                                 <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>CALL DATE</label>
-                                        <asp:TextBox ID="callDateEdit" runat="server" CssClass="form-control input-sm"></asp:TextBox>
-                                        <asp:Label ID="callDateEditValidation" runat="server"></asp:Label>
-                                    </div>
-                                    <br />
-                                    <div class="form-group">
-                                        <label>ACCOUNT</label>
-                                        <asp:DropDownList ID="manpowerEdit" runat="server" CssClass="form-control input-sm">
-                                        </asp:DropDownList>
-                                        <asp:Label ID="manpowerEditValidation" runat="server"></asp:Label>
-                                    </div>
+                                    <dx:ASPxButtonEdit ID="ASPxButtonEdit1" runat="server" EnableTheming="True" Theme="Material" Width="100%" AutoCompleteType="Disabled" Caption="Search">
+                                        <Buttons>
+                                            <dx:EditButton ClientVisible="False" Enabled="False">
+                                            </dx:EditButton>
+                                        </Buttons>
+                                        <ClearButton DisplayMode="Always">
+                                        </ClearButton>
+                                    </dx:ASPxButtonEdit>
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <div class="btn-group" role="group">
-                                <asp:Button ID="cancelEditBtn" runat="server" CssClass="btn btn-default btn-sm" Text="Close" OnClick="cancelEditBtn_Click" />
-                                <asp:Button ID="submitEditBtn" runat="server" CssClass="btn btn-primary btn-sm" Text="Save Changes" OnClick="submitEditBtn_Click" />
+
+                        <dx:ASPxGridView ID="gvWorkplans" runat="server" AutoGenerateColumns="False" DataSourceID="EntityServerModeDataSource1" EnableTheming="True" KeyFieldName="id" Theme="Material" Width="100%" OnCellEditorInitialize="gvWorkplans_CellEditorInitialize" OnCommandButtonInitialize="gvWorkplans_CommandButtonInitialize" OnRowUpdating="gvWorkplans_RowUpdating" OnDataBound="gvWorkplans_DataBound" OnStartRowEditing="gvWorkplans_StartRowEditing" OnCustomButtonCallback="gvWorkplans_CustomButtonCallback">
+                            <ClientSideEvents EndCallback="function(s, e) {
+	adjustGV();
+}" />
+                            <SettingsPager AlwaysShowPager="True" PageSize="50">
+                                <PageSizeItemSettings Visible="True" Items="50, 100, 200">
+                                </PageSizeItemSettings>
+                            </SettingsPager>
+                            <SettingsSearchPanel CustomEditorID="ASPxButtonEdit1" Delay="600" />
+                            <SettingsEditing Mode="PopupEditForm">
+                            </SettingsEditing>
+                            <Settings VerticalScrollableHeight="300" VerticalScrollBarMode="Visible" ShowHeaderFilterButton="True" />
+                            <SettingsBehavior AllowFocusedRow="True" AllowEllipsisInText="True" />
+                            <SettingsPopup>
+                                <EditForm AllowResize="True" HorizontalAlign="WindowCenter" Modal="True" ShowShadow="True" VerticalAlign="WindowCenter" VerticalOffset="-30" />
+                                <CustomizationWindow HorizontalAlign="NotSet" VerticalAlign="NotSet" />
+                            </SettingsPopup>
+                            <EditFormLayoutProperties ColCount="2">
+                                <Items>
+                                    <dx:GridViewColumnLayoutItem ColSpan="2" ColumnName="id">
+                                    </dx:GridViewColumnLayoutItem>
+                                    <dx:GridViewColumnLayoutItem ColSpan="2" ColumnName="call_date">
+                                    </dx:GridViewColumnLayoutItem>
+                                    <dx:GridViewColumnLayoutItem ColSpan="2" ColumnName="branch_code">
+                                    </dx:GridViewColumnLayoutItem>
+                                    <dx:GridViewColumnLayoutItem ColSpan="2" ColumnName="branch_name">
+                                    </dx:GridViewColumnLayoutItem>
+                                    <dx:GridViewColumnLayoutItem ColSpan="2" ColumnName="account_group_1">
+                                    </dx:GridViewColumnLayoutItem>
+                                    <dx:GridViewColumnLayoutItem ColSpan="2" ColumnName="fullname">
+                                    </dx:GridViewColumnLayoutItem>
+                                    <dx:GridViewColumnLayoutItem ColSpan="2" ColumnName="status">
+                                    </dx:GridViewColumnLayoutItem>
+                                    <dx:GridViewColumnLayoutItem ColSpan="2" ColumnName="deadline">
+                                    </dx:GridViewColumnLayoutItem>
+                                    <dx:GridViewColumnLayoutItem ColSpan="2" ColumnName="date_created">
+                                    </dx:GridViewColumnLayoutItem>
+                                    <dx:EditModeCommandLayoutItem ColSpan="2" HorizontalAlign="Right">
+                                    </dx:EditModeCommandLayoutItem>
+                                </Items>
+                            </EditFormLayoutProperties>
+                            <Columns>
+                                <dx:GridViewCommandColumn ShowEditButton="True" ShowInCustomizationForm="True" VisibleIndex="0" Width="4%">
+                                </dx:GridViewCommandColumn>
+                                <dx:GridViewDataTextColumn FieldName="id" ReadOnly="True" VisibleIndex="1" Caption="Wkplan No." SortIndex="0" SortOrder="Descending">
+                                    <PropertiesTextEdit>
+                                        <ReadOnlyStyle BackColor="#EEEEEE">
+                                        </ReadOnlyStyle>
+                                    </PropertiesTextEdit>
+                                    <SettingsHeaderFilter Mode="CheckedList">
+                                    </SettingsHeaderFilter>
+                                </dx:GridViewDataTextColumn>
+                                <dx:GridViewDataDateColumn FieldName="call_date" VisibleIndex="2" Caption="Call Date">
+                                    <PropertiesDateEdit>
+                                        <ReadOnlyStyle BackColor="#EEEEEE">
+                                        </ReadOnlyStyle>
+                                    </PropertiesDateEdit>
+                                    <SettingsHeaderFilter Mode="DateRangePicker">
+                                    </SettingsHeaderFilter>
+                                </dx:GridViewDataDateColumn>
+                                <dx:GridViewDataTextColumn FieldName="branch_name" VisibleIndex="4" Caption="Branch Name" Width="25%" ReadOnly="True">
+                                    <PropertiesTextEdit>
+                                        <ReadOnlyStyle BackColor="#EEEEEE">
+                                        </ReadOnlyStyle>
+                                    </PropertiesTextEdit>
+                                    <SettingsHeaderFilter Mode="CheckedList">
+                                    </SettingsHeaderFilter>
+                                </dx:GridViewDataTextColumn>
+                                <dx:GridViewDataTextColumn FieldName="branch_code" VisibleIndex="3" Caption="Branch Code" ReadOnly="True">
+                                    <PropertiesTextEdit>
+                                        <ReadOnlyStyle BackColor="#EEEEEE">
+                                        </ReadOnlyStyle>
+                                    </PropertiesTextEdit>
+                                    <SettingsHeaderFilter Mode="CheckedList">
+                                    </SettingsHeaderFilter>
+                                </dx:GridViewDataTextColumn>
+                                <dx:GridViewDataTextColumn FieldName="account_group_1" VisibleIndex="5" Caption="Account Group" ReadOnly="True">
+                                    <PropertiesTextEdit>
+                                        <ReadOnlyStyle BackColor="#EEEEEE">
+                                        </ReadOnlyStyle>
+                                    </PropertiesTextEdit>
+                                    <SettingsHeaderFilter Mode="CheckedList">
+                                    </SettingsHeaderFilter>
+                                </dx:GridViewDataTextColumn>
+                                <dx:GridViewDataTextColumn FieldName="status" VisibleIndex="9" Caption="Status" ReadOnly="True">
+                                    <PropertiesTextEdit>
+                                        <ReadOnlyStyle BackColor="#EEEEEE">
+                                        </ReadOnlyStyle>
+                                    </PropertiesTextEdit>
+                                    <SettingsHeaderFilter Mode="CheckedList">
+                                    </SettingsHeaderFilter>
+                                </dx:GridViewDataTextColumn>
+                                <dx:GridViewDataDateColumn FieldName="date_created" VisibleIndex="11" Caption="Date Added" ReadOnly="True">
+                                    <PropertiesDateEdit ConvertEmptyStringToNull="False">
+                                        <DropDownButton ClientVisible="False" Enabled="False">
+                                        </DropDownButton>
+                                        <ReadOnlyStyle BackColor="#EEEEEE">
+                                        </ReadOnlyStyle>
+                                    </PropertiesDateEdit>
+                                    <SettingsHeaderFilter Mode="DateRangePicker">
+                                    </SettingsHeaderFilter>
+                                </dx:GridViewDataDateColumn>
+                                <dx:GridViewDataDateColumn FieldName="deadline" VisibleIndex="10" Caption="Due" ReadOnly="True">
+                                    <PropertiesDateEdit>
+                                        <DropDownButton ClientVisible="False" Enabled="False">
+                                        </DropDownButton>
+                                        <ReadOnlyStyle BackColor="#EEEEEE">
+                                        </ReadOnlyStyle>
+                                    </PropertiesDateEdit>
+                                    <SettingsHeaderFilter Mode="DateRangePicker">
+                                    </SettingsHeaderFilter>
+                                </dx:GridViewDataDateColumn>
+                                <dx:GridViewDataComboBoxColumn Caption="Assigned" FieldName="fullname" ShowInCustomizationForm="True" VisibleIndex="8">
+                                    <PropertiesComboBox>
+                                        <ReadOnlyStyle BackColor="#EEEEEE">
+                                        </ReadOnlyStyle>
+                                    </PropertiesComboBox>
+                                    <SettingsHeaderFilter Mode="CheckedList">
+                                    </SettingsHeaderFilter>
+                                </dx:GridViewDataComboBoxColumn>
+                            </Columns>
+                            <Styles>
+                                <Header Font-Size="10pt">
+                                    <Paddings Padding="2px" PaddingBottom="7px" PaddingTop="7px" />
+                                </Header>
+                                <AlternatingRow Enabled="True">
+                                </AlternatingRow>
+                                <Cell Font-Size="10pt">
+                                    <Paddings Padding="2px" PaddingBottom="5px" PaddingTop="5px" />
+                                </Cell>
+                                <Footer Font-Size="10pt">
+                                </Footer>
+                                <PagerBottomPanel Font-Size="10pt">
+                                    <Paddings Padding="2px" />
+                                </PagerBottomPanel>
+                                <CommandColumn>
+                                    <Paddings Padding="2px" />
+                                </CommandColumn>
+                            </Styles>
+                        </dx:ASPxGridView>
+
+                    </ContentTemplate>
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="refreshBtn" />
+                    </Triggers>
+                </asp:UpdatePanel>
+
+
+
+            </div>
+        </div>
+
+        <footer class="">
+            <br />
+            <div class="container-fluid">
+                <p class="text-muted text-right">Developed by: <a href="#">BSDGSYS</a>. 2017</p>
+            </div>
+        </footer>
+    </div>
+
+
+    <%--Edit Modal--%>
+    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Edit Visit #<span id="workplanRef"></span></h4>
+                    <asp:HiddenField ID="workplanID" runat="server" />
+                    <input type="hidden" id="workplanId" />
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">Call Date</label>
+                                <div class="col-md-10">
+                                    <input type="date" id="callDateEdit" name="callDateEdit" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">Target Branch</label>
+                                <div class="col-md-10">
+                                    <select id="branchSelectEdit" name="branchSelectEdit" disabled="disabled" class="form-control">
+                                        <option></option>
+                                        <%=getAssignedBranchesByUserID() %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">Assigned To</label>
+                                <div class="col-md-10">
+                                    <select class="form-control" id="assignedToEdit" name="assignedToEdit" disabled="disabled">
+                                        <option></option>
+                                        <%=getAssignedUsers() %>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </ContentTemplate>
-            </asp:UpdatePanel>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-default cancel-visit-btn" data-dismiss="modal">Cancel</a>
+                        <asp:Button ID="submitEditBtn" runat="server" CssClass="btn btn-primary" Text="Save Changes" OnClick="submitEditBtn_Click" />
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -392,57 +393,167 @@
     <div class="modal fade" id="myModal" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-lg" role="document">
             <asp:UpdatePanel ID="UpdatePanel1" runat="server" UpdateMode="Conditional">
-                <ContentTemplate>
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="myModalLabel"><i class="fa fa-plus"></i>&nbsp;New Visit</h4>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>CALL DATE</label>
-                                        <%--<input type="date" class="form-control" id="callDate" />--%>
-                                        <asp:TextBox ID="callDate" runat="server" CssClass="form-control input-sm"></asp:TextBox>
-                                        <%--<asp:HiddenField ID="callDateHidden" runat="server" />--%>
-                                        <asp:Label ID="callDateValidation" runat="server"></asp:Label>
+                <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="submitBtn" />
+                    <asp:AsyncPostBackTrigger ControlID="branchSelectOnChange" />
+                </Triggers>
+            </asp:UpdatePanel>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">New Visit</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Call Date</label>
+                                <div class="col-sm-10">
+                                    <input type="date" id="callDate" name="callDate" class="form-control" />
+                                    <asp:Label ID="callDateValidation" runat="server"></asp:Label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Target Branch</label>
+                                <div class="col-sm-10">
+                                    <select id="branchSelect" name="branchSelect" class="form-control">
+                                        <option></option>
+                                        <%=getAssignedBranchesByUserID() %>
+                                    </select>
+                                    <asp:Button ID="branchSelectOnChange" runat="server" OnClick="branchSelectOnChange_Click" Text="" formnovalidate="formnovalidate" value="cancel" CssClass="cancel hidden" />
+                                    <asp:Label ID="branchValidation" runat="server"></asp:Label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Assigned To</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" id="assignedTo" name="assignedTo">
+                                        <option></option>
+                                        <%=getAssignedUsers() %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="checkbox_assignment" checked="checked" />
+                                        <label for="checkbox_assignment">
+                                            Always choose default assignment
+                                        </label>
                                     </div>
-                                    <div class="form-group">
-                                        <label>ACCOUNT</label>
-                                        <%--<select class="form-control" id="branchSelect">
-                                            <option></option>
-                                            <%=loadBranches()%>
-                                        </select>
-                                        <asp:HiddenField ID="branchHidden" runat="server" />--%>
-                                        <asp:DropDownList ID="manpowerSelect" runat="server" CssClass="form-control input-sm">
-                                            <asp:ListItem></asp:ListItem>
-                                        </asp:DropDownList>
-                                        <asp:Label ID="manpowerValidation" runat="server"></asp:Label>
-                                    </div>
+                                    <asp:Label ID="assignedToValidation" runat="server"></asp:Label>
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <%--<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>--%>
-                            <div class="btn-group" role="group">
-                                <asp:Button ID="cancelBtn" runat="server" CssClass="btn btn-danger btn-sm" Text="Cancel" OnClick="cancelBtn_Click" />
-                                <asp:Button ID="submitBtn" runat="server" CssClass="btn btn-success btn-sm" Text="Submit" OnClick="submitBtn_Click" />
-                            </div>
-                        </div>
                     </div>
-                </ContentTemplate>
-                <Triggers>
-                    <asp:AsyncPostBackTrigger ControlID="cancelBtn" />
-                    <asp:AsyncPostBackTrigger ControlID="submitBtn" />
-                </Triggers>
-            </asp:UpdatePanel>
+                    <table class="hidden table table-bordered table-condensed table-hover" id="branches_tbl">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th class="col-sm-2">Account Group</th>
+                                <th class="col-sm-2">Branch Code</th>
+                                <th class="col-sm-5">Branch Name</th>
+                                <th class="col-sm-3">Last Visit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">
+                                    <input type="checkbox" /></td>
+                                <td>Watsons</td>
+                                <td>1322</td>
+                                <td>WATSONS WATSONS ROBINSONS BUTUAN - 1322 - COMBINED</td>
+                                <td>Cirilo Prieto<small class="text-muted">04.07.2017</small></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group" role="group">
+                        <a class="cancel-visit-btn btn btn-default" data-dismiss="modal">Cancel</a>
+                        <asp:Button ID="submitBtn" runat="server" CssClass="hidden btn btn-success" Text="Save" OnClick="submitBtn_Click" />
+                        <a class="btn btn-success" id="saveBtn">Save Visit</a>
+                    </div>
+                    <asp:Button ID="refreshBtn" CssClass="hidden" runat="server" Text="Refresh" OnClick="refreshBtn_Click" />
+                </div>
+            </div>
         </div>
     </div>
 
+    <%--Validate Modal--%>
+    <div class="modal fade" id="validateModal" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4>Confirm Submission</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        The system has found <span class="matches_count"></span> similar visit/s for <span class="qtr_count"></span>. Do you want to continue?
+                    </p>
+                    <br />
+                    <table class="table table-condensed table-bordered" id="workplan_matches_tbl">
+                        <thead>
+                            <tr>
+                                <th>Branch</th>
+                                <th>Call Date</th>
+                                <th>Due Date</th>
+                                <th>Coordinator</th>
+                                <th>Date Added</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="branch"></td>
+                                <td class="call-date">04.07.2017</td>
+                                <td class="due-date">04.17.2017</td>
+                                <td class="assigned">Cirilio Prieto</td>
+                                <td class="date-added">04.06.2017</td>
+                            </tr>
+                            <tr>
+                                <td class="branch"></td>
+                                <td class="call-date">04.07.2017</td>
+                                <td class="due-date">04.17.2017</td>
+                                <td class="assigned">Cirilio Prieto</td>
+                                <td class="date-added">04.06.2017</td>
+                            </tr>
+                            <tr>
+                                <td class="branch"></td>
+                                <td class="call-date">04.07.2017</td>
+                                <td class="due-date">04.17.2017</td>
+                                <td class="assigned">Cirilio Prieto</td>
+                                <td class="date-added">04.06.2017</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group" role="group">
+                        <%--<a class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#myModal">Cancel</a>--%>
+                        <a class="btn btn-default" onclick="$('#validateModal').one('hidden.bs.modal', function() { $('#myModal').modal('show'); }).modal('hide');">Cancel</a>
+                        <%--<a id="confirmBtn" class="btn btn-success">Proceed</a>--%>
+                        <asp:Button ID="confirmBtn" CssClass="btn btn-success" runat="server" Text="Proceed" OnClick="confirmBtn_Click" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <asp:UpdatePanel ID="UpdatePanel4" runat="server">
+        <Triggers>
+            <asp:AsyncPostBackTrigger ControlID="newVisitBtn" />
+            <%--<asp:AsyncPostBackTrigger ControlID="workplan_rptr" />--%>
+            <asp:AsyncPostBackTrigger ControlID="gvWorkplans"/>
+            <asp:AsyncPostBackTrigger ControlID="confirmBtn" />
+            <asp:AsyncPostBackTrigger ControlID="submitEditBtn" />
+        </Triggers>
+    </asp:UpdatePanel>
+
     <asp:UpdateProgress ID="UpdateProgress2" runat="server">
         <ProgressTemplate>
-            <div id="loadingModal">
+            <div id="loadingModal" aria-invalid="false">
                 <!-- Place at bottom of page -->
             </div>
         </ProgressTemplate>
@@ -450,50 +561,571 @@
 
     <script type="text/javascript">
 
-        function pageLoad() {
-            // replace your DOM Loaded settings here. 
-            // If you already have document.ready event, 
-            // just take the function part and replace here. 
-            // Not with document.ready 
-            $('#<%= manpowerSelect.ClientID %>').select2({
-                placeholder: "Select Branch/Coordinator",
-                theme: "bootstrap"
+        var validator;
+        var isAjaxing = false
+
+        $(document).ready(function () {
+            adjustGV();
+
+            var d = new Date();
+
+            var qtr = getQuarter(d);
+            $(".qtr_count").text("Q"+qtr);
+
+            d.setDate(d.getDate() - 10);
+
+            var dd = d.getDate();
+            var mm = d.getMonth() + 1; //January is 0!
+            var yyyy = d.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            if (mm < 10) {
+                mm = '0' + mm
+            }
+
+            today = yyyy + '-' + mm + '-' + dd;
+
+            $("#callDate").attr({
+                "min": today
             });
 
-            $('#<%= manpowerEdit.ClientID %>').select2({
-                placeholder: "Select Branch/Coordinator",
-                theme: "bootstrap"
+            $("#callDateEdit").attr({
+                "min": today
             });
 
-            $('#<%= callDate.ClientID %>').datepicker({
+            //$("#myModal").on('show.bs.modal', function (e) {
+            //    $("#myModal").modal('handleUpdate');
+            //});
+
+            //$("#validateModal").on('show.bs.modal', function (e) {
+            //    $("#validateModal").modal('handleUpdate');
+            //});
+
+        })
+
+        function adjustGV() {
+            window.onload = function () {
+                $('.dxgvCSD').css("width", "100%");
+                $('.dxgvControl_Material .dxgvCSD').css("padding-right", "0");
+                $('.dxgvCSD').css("padding-right", "0");
+            };
+
+            $(window).resize(function () {
+                setTimeout(function () {
+                    $('.dxgvCSD').css("width", "100%");
+                    $('.dxgvControl_Material .dxgvCSD').css("padding-right", "0");
+                    $('.dxgvCSD').css("padding-right", "0");
+                }, 1);
             });
 
-            $('#<%= callDateEdit.ClientID %>').datepicker({
+            $('.dxgvCSD').css("width", "100%");
+            $('.dxgvControl_Material .dxgvCSD').css("padding-right", "0");
+            $('.dxgvCSD').css("padding-right", "0");
+
+            //alert("hello world");
+        }
+
+        function initializeVisitForm() {
+            $("#myModal").modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            $('#myModal').on('shown.bs.modal', function (e) {
+                initializeValidation();
+            });
+        }
+
+        function initializeEditVisitForm() {
+            $('#workplanRef').text(arguments[0]);
+            if (isAjaxing) return;
+            isAjaxing = true;
+            $.ajax({
+                method: "POST",
+                url: "tl_workplan.aspx/editWorkplanByWorkplanId",
+                data: '{workplanId: "' + arguments[0] + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: true,
+                success: function (response) {
+                    var workplan = response.d;
+                    //alert(workplan.Deadline);
+                    if (workplan != null) {
+                        $("#editModal").modal({
+                            backdrop: 'static',
+                            keyboard: false
+                        });
+                        $('#callDateEdit').val(workplan.CallDate);
+                        $('#branchSelectEdit').val(workplan.BranchId).change();
+                        $('#assignedToEdit').val(workplan.UserId).change();
+                    } else {
+                        alert("Workplan invalid!");
+                    }
+                },
+                failure: function (response) {
+                    alert("failed");
+                },
+                error: function (response) {
+                    alert("error");
+                }
+            }).done(function () {
+                isAjaxing = false;
+            });
+
+            $('#editModal').on('shown.bs.modal', function (e) {
+                initializeValidation();
+            });
+        }
+
+        function resetVisitForm() {
+            if ($('#myModal').is(':visible')) {
+                $("#assignedTo").val('').trigger('change');
+                $("#branchSelect").val('').trigger('change');
+                var form = $("#form1");
+                form.validate().resetForm();
+                form[0].reset();
+                $(".has-error").each(function () {
+                    $(this).removeClass("has-error");
+                });
+                form.validate().cancelSubmit = true;
+                form.validate().destroy();
+            } else if ($('#editModal').is(':visible')) {
+                var form = $("#form1");
+                form.validate().resetForm();
+                form[0].reset();
+                $(".has-error").each(function () {
+                    $(this).removeClass("has-error");
+                });
+                form.validate().cancelSubmit = true;
+                form.validate().destroy();
+            }
+        };
+
+        function initializeValidation() {
+            if ($('#myModal').is(':visible')) {
+                $.validator.setDefaults({
+                    highlight: function (element) {
+                        var elem = $(element);
+                        $(element).closest('.form-group').addClass('has-error');
+                        //$(element).parent().removeClass('has-success').addClass('has-error');
+                    },
+                    unhighlight: function (element) {
+                        $(element).closest('.form-group').removeClass('has-error');
+                        //$(element).parent().removeClass('has-error').addClass('has-success');
+                    },
+                    errorElement: 'span',
+                    errorClass: 'help-block',
+                    errorPlacement: function (error, element) {
+                        if (element.parent('.input-group').length) {
+                            error.insertAfter(element.parent());
+                        } else {
+                            //error.insertAfter(element.parent());
+                            element.parent().append(error);
+                        }
+                        //var elem = $(element);
+                        //error.insertAfter(element);
+                    }
+                });
+
+                validator = $("#form1").validate({
+                    rules: {
+                        callDate: {
+                            required: true,
+                            date: true,
+                        },
+                        branchSelect: {
+                            required: true,
+                        },
+                        assignedTo: {
+                            required: true,
+                        }
+                    },
+                    messages: {
+                        callDate: {
+                            required: "This is required",
+                        },
+                        branchSelect: {
+                            required: "This is required",
+                        },
+                        assignedTo: {
+                            required: "This is required",
+                        }
+                    },
+                    submitHandler: function (form) {
+                    },
+                });
+            } else if ($('#editModal').is(':visible')) {
+                $.validator.setDefaults({
+                    highlight: function (element) {
+                        var elem = $(element);
+                        $(element).closest('.form-group').addClass('has-error');
+                        //$(element).parent().removeClass('has-success').addClass('has-error');
+                    },
+                    unhighlight: function (element) {
+                        $(element).closest('.form-group').removeClass('has-error');
+                        //$(element).parent().removeClass('has-error').addClass('has-success');
+                    },
+                    errorElement: 'span',
+                    errorClass: 'help-block',
+                    errorPlacement: function (error, element) {
+                        if (element.parent('.input-group').length) {
+                            error.insertAfter(element.parent());
+                        } else {
+                            //error.insertAfter(element.parent());
+                            element.parent().append(error);
+                        }
+                        //var elem = $(element);
+                        //error.insertAfter(element);
+                    }
+                });
+
+                validator = $("#form1").validate({
+                    rules: {
+                        callDateEdit: {
+                            required: true,
+                            date: true,
+                        }
+                    },
+                    messages: {
+                        callDateEdit: {
+                            required: "This is required",
+                        }
+                    },
+                    submitHandler: function (form) {
+                    },
+                });
+            }
+        }
+
+        function setAssignedEmp() {
+            var branchId = $('#branchSelect').val();
+            if (branchId != null) {
+                var defaultEmp = $('#checkbox_assignment').prop("checked");
+                if (isAjaxing) return;
+                isAjaxing = true;
+                $.ajax({
+                    method: "POST",
+                    url: "tl_workplan.aspx/getAssignedEmpByBranchID",
+                    data: '{branchId: "' + branchId + '"}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: true,
+                    success: function (response) {
+                        var assignedUser = response.d;
+                        //$('#assignedTo option[value=' + assignedUser.Id + ']').attr('selectec', 'selected');
+                        if (defaultEmp === true) {
+                            //alert(assignedUser.Id);
+                            if (assignedUser.Id == null) {
+                                //alert('Hey this is null!');
+                                $('#assignedTo').closest('.form-group').addClass('has-error');
+                                var $help = $("<span>", { "class": "help-block" });
+                                $help.html("Branch has no default assignment. Please assign a user or choose a different branch");
+                                $('#assignedTo').parent().append($help);
+                                $('#checkbox_assignment').prop("disabled", true);
+                                $("#assignedTo").val('').trigger('change');
+                            } else {
+                                $('#assignedTo').closest('.form-group').removeClass('has-error');
+                                $('#assignedTo').parent().find('span.help-block').remove();
+                                $('#assignedTo').val(assignedUser.Id).change();
+                                $('#checkbox_assignment').prop("disabled", false);
+                            }
+                            //alert(assignedUser.Id);
+                        }
+                        //$(assignedUser).each(function () {
+                        //    alert(this.Fullname);
+                        //});
+                        //alert(assignedUser.Id);
+                    },
+                    failure: function (response) {
+                        alert("failed");
+                    },
+                    error: function (response) {
+                        alert("error");
+                    }
+                }).done(function () {
+                    isAjaxing = false;
+                });
+            }
+        };
+
+        function findWorkplanMatches() {
+            var isValid = $("#form1").valid();
+            if (isValid) {
+                var callDateInput = $("#callDate").val();
+                var branch = $("#branchSelect").val();
+                var emp = $("#assignedTo").val();
+                var workplan = { CallDate: callDateInput, BranchId: branch, UserId: emp };
+                if (isAjaxing) return;
+                isAjaxing = true;
+                $.ajax({
+                    method: "POST",
+                    url: "tl_workplan.aspx/findWorkplanMatches",
+                    data: JSON.stringify({ 'workplan': workplan }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: true,
+                    success: function (response) {
+                        var matches = response.d;
+
+                        //$("#myModal").modal("hide");
+                        //$("#myModal").on("hidden.bs.modal", function (e) {
+                        //    //alert("hello world");
+                        //    $("#validateModal").modal("show");
+                        //});
+
+
+                        if (matches === "") {
+                            isAjaxing = false;
+                            SaveWorkplan();
+                        } else {
+                            $("#workplan_matches_tbl").find("tbody").html(matches);
+                            $(".matches_count").html($('#workplan_matches_tbl >tbody>tr').length);
+                            //$('#validateModal').modal('handleUpdate');
+                            $('#myModal').one('hidden.bs.modal', function () {
+                                $('#validateModal').modal('show');
+                            }).modal('hide');
+                        }
+
+                    },
+                    failure: function (response) {
+                        alert("failed");
+                    },
+                    error: function (response) {
+                        alert("error");
+                    }
+                }).done(function () {
+                    isAjaxing = false;
+                });
+            }
+        }
+
+        function SaveWorkplan() {
+            var callDateInput = $("#callDate").val();
+            var branch = $("#branchSelect").val();
+            var emp = $("#assignedTo").val();
+            var workplan = { CallDate: callDateInput, BranchId: branch, UserId: emp };
+            if (isAjaxing) return;
+            isAjaxing = true;
+            $.ajax({
+                method: "POST",
+                url: "tl_workplan.aspx/saveWorkplan",
+                data: JSON.stringify({ 'data': workplan }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: true,
+                success: function (response) {
+                    $("#assignedTo").val('').trigger('change');
+                    $("#branchSelect").val('').trigger('change');
+                    var form = $("#form1");
+                    form.validate().resetForm();
+                    form[0].reset();
+                    $(".has-error").each(function () {
+                        $(this).removeClass("has-error");
+                    });
+                    form.validate().cancelSubmit = true;
+                    form.validate().destroy();
+                    //alert("workplan saved!");
+                    //insert code here
+                    $("#myModal").modal('hide');
+                    var message = $("<div></div>").attr('id', 'myAlert').text("Workplan saved!");
+                    var button = $("<button></button").addClass("close").attr('data-dismiss', 'alert').attr('type', 'button').attr('aria-label', 'Close').append($("<span></span>").html('&times;').attr('aria-hidden', 'true'));
+                    message.append(button);
+                    message.addClass("alert alert-success fade in");
+                    $("#<%=messagelbl.ClientID%>").html(message);
+                    $("#<%=refreshBtn.ClientID%>").click();
+                },
+                failure: function (response) {
+                    alert("failed");
+                },
+                error: function (response) {
+                    alert("error");
+                }
+            }).done(function () {
+                isAjaxing = false;
+            });
+        }
+
+        function confirmVisit() {
+            $('#validateModal').modal('hide');
+            SaveWorkplan();
+        }
+
+        function updateWorkplan() {
+            var isValid = $("#form1").valid();
+            var workplanRef = arguments[0];
+            if (isValid) {
+                var callDateInput = $("#callDateEdit").val();
+                var workplan = { CallDate: callDateInput };
+                if (isAjaxing) return;
+                isAjaxing = true;
+                $.ajax({
+                    method: "POST",
+                    url: "tl_workplan.aspx/updateWorkplan",
+                    data: JSON.stringify({ 'data': workplan }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: true,
+                    success: function (response) {
+                        resetVisitForm();
+                        $('#editModal').modal('hide');
+                        $("#<%=refreshBtn.ClientID%>").click();
+                        if (response.d) {
+                            //alert("workplan saved!");
+                            var message = $("<div></div>").attr('id', 'myAlert').text("Workplan #" + workplanRef + " updated!");
+                            var button = $("<button></button").addClass("close").attr('data-dismiss', 'alert').attr('type', 'button').attr('aria-label', 'Close').append($("<span></span>").html('&times;').attr('aria-hidden', 'true'));
+                            message.append(button);
+                            message.addClass("alert alert-success fade in");
+                        } else {
+                            var message = $("<div></div>").attr('id', 'myAlert').text("Something went wrong!");
+                            var button = $("<button></button").addClass("close").attr('data-dismiss', 'alert').attr('type', 'button').attr('aria-label', 'Close').append($("<span></span>").html('&times;').attr('aria-hidden', 'true'));
+                            message.append(button);
+                            message.addClass("alert alert-danger fade in");
+                        }
+                        $("#<%=messagelbl.ClientID%>").html(message);
+
+                    },
+                    error: function (response) {
+                        alert("error");
+                    },
+                    failure: function (response) {
+                        alert("failed");
+                    }
+                }).done(function () {
+                    isAjaxing = false;
+                });
+            }
+        }
+
+        function initializeSettings(sender, args) {
+            adjustGV();
+
+            //Temporary fix for multiple instances of modal
+            $('.modal').on('shown.bs.modal', function () {
+                $('body').addClass('modal-open');
             });
 
             $('#workplans').DataTable({
-                //"paging": false,
                 "ordering": false,
-                //"info": false,
                 "language": {
                     "emptyTable": "No data available"
                 },
                 "bDestroy": true
             });
+
+            $("#myModal").on('hidden.bs.modal', function (e) {
+                if ($('#validateModal').is(':visible')) {
+
+                } else {
+                    //resetVisitForm();
+                }
+            });
+
+            $("#validateModal").on('hidden.bs.modal', function (e) {
+                if ($('#myModal').is(':visible')) {
+
+                } else {
+                    resetVisitForm();
+                }
+            });
+
+            $("#editModal").on('hidden.bs.modal', function (e) {
+                resetVisitForm();
+                if (isAjaxing) return;
+                isAjaxing = true;
+                $.ajax({
+                    method: "POST",
+                    url: "tl_workplan.aspx/clearSelection",
+                    success: function (response) {
+                        console.log("selection cleared!");
+                    },
+                    failure: function (response) {
+                        console.log("failed");
+                    },
+                    error: function (response) {
+                        console.log("error");
+                    }
+                }).done(function () {
+                    isAjaxing = false;
+                });
+            });
+
+            $(".cancel-visit-btn").on("click", function (e) {
+                resetVisitForm();
+            });
+
+            $('#branchSelect').select2({
+                placeholder: "",
+                theme: "bootstrap",
+                allowClear: true,
+                templateResult: function (state) {
+                    var option = state.text;
+                    var str = option.split('!@#');
+                    return $('<div><small><strong>' + str[0] + ' ' + str[1] + '</strong></small></br><div><small>' + str[2] + '</small></div></div>');
+                },
+                templateSelection: function (state) {
+                    var option = state.text;
+                    var str = option.split('!@#');
+                    return str[0] + ' ' + null && str[1];
+                },
+            });
+
+            $('#branchSelectEdit').select2({
+                placeholder: "",
+                theme: "bootstrap",
+                allowClear: true,
+                templateResult: function (state) {
+                    var option = state.text;
+                    var str = option.split('!@#');
+                    return $('<div><small><strong>' + str[0] + ' ' + str[1] + '</strong></small></br><div><small>' + str[2] + '</small></div></div>');
+                },
+                templateSelection: function (state) {
+                    var option = state.text;
+                    var str = option.split('!@#');
+                    return str[0] + ' ' + null && str[1];
+                }
+            });
+
+            $('#branchSelect').on('change', function (e) {
+                if ($('#branchSelect').val() != '' && $('#branchSelect').val() != null) {
+                    setAssignedEmp();
+                }
+            });
+
+            $("#checkbox_assignment").on("change", function () {
+                var defaultEmp = $('#checkbox_assignment').prop("checked");
+                if (defaultEmp === true) {
+                    if ($('#branchSelect').val() != '' && $('#branchSelect').val() != null) {
+                        setAssignedEmp();
+                    }
+                }
+                //$("#assignedTo").prop("disabled", defaultEmp);
+            });
+
+            $("#saveBtn").on("click", function (e) {
+                var isValid = $("#form1").valid();
+                if (isValid) {
+                    $("#<%=submitBtn.ClientID%>").click();
+                }
+            });
+
+            $('.saveBtn').on("click", function (e) {
+                if ($('#myModal').is(':visible')) {
+
+                } else if ($('#editModal').is(':visible')) {
+
+                }
+            });
+
+            $('#assignedTo').select2({
+                placeholder: "",
+                theme: "bootstrap",
+                allowClear: true,
+            });
+
         }
-
-        $(document).ready(function () {
-
-
-            //$.extend($.fn.dataTableExt.oStdClasses, {
-            //    "sFilterInput": "form-control input-sm",
-            //    "sLengthSelect": "form-control input-sm",
-            //    "sPaging": "pagination pagination-sm",
-            //});
-
-            //$('div.dataTables_paginate .pagination').addClass('pagination-sm');
-
-        });
 
         function closeModal() {
             $('#myModal').modal('hide');
@@ -514,7 +1146,15 @@
             $('#<%=submitBtn.ClientID %>').prop('disabled', true);
         }
 
+        function getQuarter(d) {
+            //d = d || new Date();
+            //var m = Math.floor(d.getMonth() / 3) + 2;
+            //return m > 4 ? m - 4 : m;
+            return Math.floor((d.getMonth() + 3) / 3);
+        }
+
         window.onbeforeunload = preventMultipleSubmissions;
+
     </script>
 
 </asp:Content>

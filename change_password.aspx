@@ -243,7 +243,7 @@
                 }
 
                 $(".form-a").on('keyup change blur', function () {
-                    update();
+                    //update();
                 });
 
                 $("#oldPassword").on("keyup change blur", function () {

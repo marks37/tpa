@@ -2,9 +2,7 @@
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 
-<%@ Register Assembly="DevExpress.Web.v14.1, Version=14.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Web.ASPxEditors" TagPrefix="dx" %>
-
-<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <style>
         body {
             margin-bottom: 70px;
@@ -29,11 +27,11 @@
         }
 
         #visibility > tbody > tr > .custom-row-1 {
-            padding-bottom: 0px;
+            /*padding-bottom: 0px;*/
         }
 
         #visibility > tbody > tr > .custom-row-2 {
-            padding-top: 0px;
+            /*padding-top: 0px;*/
         }
 
         .details-box {
@@ -146,8 +144,7 @@
     <script src="Scripts/demo.min.js"></script>
     <script src="Scripts/AsyncFileUploadValidationPlugin.js"></script>
 </asp:Content>
-<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
-    <asp:ScriptManager ID="MainScriptManager" runat="server" EnablePartialRendering="true" />
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <div class="" style="display: none">
         <div class="navbar navbar-default navbar-fixed-top" style="">
             <div class="container">
@@ -542,7 +539,8 @@
                                     <asp:Repeater ID="confirmChild" runat="server" OnItemDataBound="confirmChild_ItemDataBound">
                                         <ItemTemplate>
                                             <tr>
-                                                <td class="custom-row-1"><%# Eval("name") %><asp:HiddenField ID="HiddenFieldId2" runat="server" Value='<%# Eval("id") %>' /></td>
+                                                <td class="custom-row-1"><%# Eval("name") %><asp:HiddenField ID="HiddenFieldId2" runat="server" Value='<%# Eval("id") %>' />
+                                                </td>
                                                 <td class="custom-row-1">
                                                     <asp:Label ID="hit" runat="server" Text=""></asp:Label>
                                                 </td>

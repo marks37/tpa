@@ -119,14 +119,16 @@ public partial class change_password : System.Web.UI.Page
             }
             body += "," + status;
             string[] message = body.Split(',');
-
-            DBLayer.changePassword(newPassword,user.Id);
-            clsActivityLog log = new clsActivityLog();
-            log.Username = user.Username;
-            log.Activity = "User changed password";
-            log.DateCreated = DBLayer.GetCurrentTime().ToString();
-            log.PageUrl = HttpContext.Current.Request.Url.AbsolutePath;
-            DBLayer.addNewActivityLog(log);
+            if (validation == 0)
+            {
+                DBLayer.changePassword(newPassword, user.Id);
+                clsActivityLog log = new clsActivityLog();
+                log.Username = user.Username;
+                log.Activity = "User changed password";
+                log.DateCreated = DBLayer.GetCurrentTime().ToString();
+                log.PageUrl = HttpContext.Current.Request.Url.AbsolutePath;
+                DBLayer.addNewActivityLog(log);
+            }
             return message;
         }
         catch (Exception)

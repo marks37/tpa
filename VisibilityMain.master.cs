@@ -12,8 +12,28 @@ public partial class Visibility : System.Web.UI.MasterPage
 {
     clsDBLayer DBLayer = new clsDBLayer(ConfigurationManager.ConnectionStrings["VisibilityDB"].ToString());
 
+    public int iWarningTimeoutInMilliseconds;
+    public int iSessionTimeoutInMilliseconds;
+    public string sTargetURLForSessionTimeout;
+
     protected void Page_Load(object sender, EventArgs e)
     {
+        Page.Header.DataBind();
+        sTargetURLForSessionTimeout = "/Site_Login.aspx";
+        int iNumberOfMinutesBeforeSessionTimeoutToWarnUser = 1;
+
+        //Get the sessionState timeout (from web.config).
+        //If not set there, the default is 20 minutes.
+        int iSessionTimeoutInMinutes = Session.Timeout;
+
+        //Compute our timeout values, one for
+        //our warning, one for session termination.
+        int iWarningTimeoutInMinutes = iSessionTimeoutInMinutes - iNumberOfMinutesBeforeSessionTimeoutToWarnUser;
+
+        iWarningTimeoutInMilliseconds = iWarningTimeoutInMinutes * 60 * 1000;
+        iSessionTimeoutInMilliseconds = iSessionTimeoutInMilliseconds * 60 * 1000;
+
+
         clsUser user = (clsUser)Session["user"];
         if (Session["user"] == null)
         {
@@ -23,11 +43,12 @@ public partial class Visibility : System.Web.UI.MasterPage
         {
             username.Text = user.Fullname;
 
-
             if (user.Type.Equals("Coordinator") || user.Type.Equals("Promo Rep"))
             {
-                workplanLink.Attributes.Add("class", "hidden");
-                //visibLink.Attributes.Add("class", "hidden");
+                //workplanLink.Attributes.Add("class", "hidden");
+                workplanLink.Visible = false;
+                coorLink.Visible = false;
+                //coorLink.Attributes.Add("class", "hidden");
             }
 
         }
@@ -51,7 +72,7 @@ public partial class Visibility : System.Web.UI.MasterPage
         clsUser user = (clsUser)Session["user"];
         if (Session["user"] == null)
         {
-            Response.Redirect("~/Site_Login.aspx");
+            //Response.Redirect("~/Site_Login.aspx");
         }
         else
         {
@@ -126,5 +147,13 @@ public partial class Visibility : System.Web.UI.MasterPage
         //confirmPassword.Text = "";
         //oldPassword.Text = "";
         //ScriptManager.RegisterStartupScript(UpdatePanel1, this.GetType(), "changePassword", "closeChangePasswordModal();", true);
+    }
+    protected void btnContinueSession_Click(object sender, EventArgs e)
+    {
+        //ScriptManager.RegisterStartupScript(UpdatePanel1, this.GetType(), "alert", "alert('huy');", true);
+    }
+    protected void sessionTimeoutBtn_Click(object sender, EventArgs e)
+    {
+        Application["Session"] = "Your session has timed out.";
     }
 }

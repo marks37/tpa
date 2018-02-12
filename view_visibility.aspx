@@ -2,13 +2,16 @@
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 
-<%@ Register Assembly="DevExpress.Web.v14.1, Version=14.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Web.ASPxEditors" TagPrefix="dx" %>
-
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <style>
         body {
             margin-bottom: 70px;
             background-color: #F5F5F5;
+        }
+
+        .details-box {
+            border: 1px solid #ddd;
+            padding: 15px;
         }
 
         .input-group-addon-only {
@@ -43,16 +46,9 @@
             /*padding-top: 0px;*/
         }
 
-        #visibility>tbody>tr>td{
-            padding-top:20px;
-            padding-bottom:20px;
-        }
-
-
-
-        .details-box {
-            border: 1px solid #ddd;
-            padding: 15px;
+        #visibility > tbody > tr > td {
+            /*padding-top:20px;*/
+            /*padding-bottom:20px;*/
         }
 
         #visibility > thead > tr > th {
@@ -73,8 +69,12 @@
         }
 
         #visibility > tbody > tr > td {
-            /*border-top: 0;*/
+            border-top: 0;
             /*border: 0;*/
+        }
+
+        #visibility > tbody + tbody {
+            border-top: 1px solid #ddd;
         }
 
 
@@ -110,8 +110,8 @@
                 }
 
                 #visibility > tbody, #visibility > tbody + tbody {
-                    border-top: 1px solid #EEEEEE;
-                    border-bottom: 1px solid #EEEEEE;
+                    /*border-top: 1px solid #EEEEEE;*/
+                    /*border-bottom: 1px solid #EEEEEE;*/
                 }
 
         #visib_pictures > tbody > tr > td {
@@ -137,22 +137,13 @@
             /*height: 1em;
             width: 50%;
             padding: 3px;*/
-            transition: all 0.5s ease;
+            /*transition: all 0.5s ease;*/
         }
 
             textarea:focus {
-                height: 6em;
+                /*height: 6em;*/
             }
     </style>
-    <link href="Content/select2.min.css" rel="stylesheet" />
-    <link href="Content/select2-bootstrap.min.css" rel="stylesheet" />
-    <link href="Content/select2-bootstrap.css" rel="stylesheet" />
-    <script src="Scripts/select2.min.js"></script>
-    <link href="Content/jquery-ui.css" rel="stylesheet" />
-    <link href="Content/bootstrap-modal-carousel.min.css" rel="stylesheet" />
-    <script src="Scripts/bootstrap-modal-carousel.min.js"></script>
-    <script src="Scripts/demo.min.js"></script>
-    <script src="Scripts/AsyncFileUploadValidationPlugin.js"></script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <div id="lower-navbar" class="container-fluid">
@@ -164,13 +155,20 @@
             <div class="pull-right">
                 <a id="backBtn" runat="server" class="btn btn-default btn-sm" style="font-size: 18px; padding: 0px 10px;"><span class="text-muted fa fa-long-arrow-left"></span></a>
                 <div class="btn-group" role="group">
-                    <asp:LinkButton ID="saveDraftBtn" OnClientClick="this.blur();" CssClass="btn btn-default btn-sm" runat="server" OnClick="saveDraftBtn_Click"><span class="">Save as Draft</span></asp:LinkButton>
-                    <asp:Button ID="submitBtn" CssClass="btn btn-success btn-sm" runat="server" Text="Submit Visibility to TL" OnClick="submitBtn_Click" />
-                    <a class="btn btn-default btn-sm disabled" id="statusBtn" runat="server" visible="false"></a>
+                    <asp:UpdatePanel runat="server">
+                        <ContentTemplate>
+                            <asp:LinkButton ID="saveDraftBtn" CssClass="btn btn-default btn-sm" runat="server" OnClick="saveDraftBtn_Click"><span class="">Save as Draft</span></asp:LinkButton>
+                            <asp:Button ID="submitBtn" CssClass="btn btn-success btn-sm" runat="server" Text="Submit Visibility to TL" OnClick="submitBtn_Click" />
+                            <a class="btn btn-default btn-sm disabled" id="statusBtn" runat="server" visible="false"></a>
+                        </ContentTemplate>
+                        <Triggers>
+                            <asp:AsyncPostBackTrigger ControlID="confirmSubmitBtn" />
+                        </Triggers>
+                    </asp:UpdatePanel>
                 </div>
             </div>
-            <div class="clearfix"></div>
-        </div>
+        <div class="clearfix"></div>
+    </div>
     </div>
 
     <div class="" id="main-content-wrapper">
@@ -179,11 +177,12 @@
             <br />
             <asp:UpdatePanel ID="UpdatePanel4" runat="server">
                 <ContentTemplate>
-                    <asp:Label ID="validationSummary" ClientIDMode="Static" runat="server"></asp:Label>
+                    <asp:Label ID="validationSummary" ClientIDMode="Static" runat="server">eto yun</asp:Label>
                 </ContentTemplate>
                 <Triggers>
                     <asp:AsyncPostBackTrigger ControlID="saveDraftBtn" />
                     <asp:AsyncPostBackTrigger ControlID="submitBtn" />
+                    <asp:AsyncPostBackTrigger ControlID="confirmSubmitBtn" />
                 </Triggers>
             </asp:UpdatePanel>
 
@@ -207,7 +206,7 @@
                     <ContentTemplate>
                         <asp:Button ID="test123" runat="server" Text="refresh" OnClick="test_Click" CssClass="hidden" />
                         <div class="">
-                            <div class="table-responsive">
+                            <div class="">
                                 <table id="visibility" class="table table-condensed">
                                     <thead>
                                         <tr>
@@ -224,7 +223,7 @@
                                         <ItemTemplate>
                                             <tbody>
                                                 <tr class="">
-                                                    <td rowspan="3">
+                                                    <td rowspan="<%# Convert.ToInt32(Eval("response_count"))+1 %>">
                                                         <address>
                                                             <br />
                                                             <strong><%# DataBinder.Eval(Container.DataItem, "itemCode") %><asp:HiddenField ID="HiddenFieldId1" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "id") %>' />
@@ -239,10 +238,14 @@
                                                 <asp:Repeater ID="childRepeater" runat="server" OnItemCommand="childRepeater_ItemCommand" OnItemDataBound="R2_ItemDataBound">
                                                     <ItemTemplate>
                                                         <tr class="">
-                                                            <td class="custom-row-1">
+                                                            <td class="">
+                                                                <br />
+                                                                <br />
                                                                 <%# Eval("name") %><asp:HiddenField ID="HiddenFieldId2" runat="server" Value='<%# Eval("id") %>' />
                                                                 <br />
                                                                 <asp:Label ID="itemValidate" CssClass="text-danger small" runat="server" Text=""></asp:Label>
+                                                                <br />
+                                                                <br />
                                                             </td>
                                                             <td class="text-center">
                                                                 <div class="form-inline">
@@ -279,7 +282,7 @@
                                                             </td>
                                                             <td></td>
                                                             <td class="text-center">
-                                                                <asp:TextBox ID="remarks" runat="server" TextMode="MultiLine" CssClass="form-control input-sm" Rows="1" Text='<%# Eval("remarks") %>'></asp:TextBox>
+                                                                <asp:TextBox ID="remarks" runat="server" TextMode="MultiLine" CssClass="form-control input-sm" Rows="3" Text='<%# Eval("remarks") %>'></asp:TextBox>
                                                             </td>
                                                             <td class="">
                                                                 <div class="text-center">
@@ -309,18 +312,6 @@
             </div>
         </div>
 
-        <div class="text-center col-md-2">
-            <%--<a class="btn btn-primary btn-block">Save!</a>--%>
-            <%--<asp:Button ID="cancelBtn" CssClass="btn btn-default btn-block" runat="server" Text="Cancel" OnClick="cancelBtn_Click" />--%>
-
-            <%--<asp:Button ID="backBtn" CssClass="btn btn-primary" runat="server" Text="Back" />--%>
-        </div>
-
-        <div class="text-center col-md-4">
-            <%--<a class="btn btn-primary btn-block">Save!</a>--%>
-        </div>
-        <div class="text-center col-md-4">
-        </div>
         <div class="clearfix"></div>
 
     </div>
@@ -339,6 +330,7 @@
                         </div>
                         <div class="modal-body">
                             <div style="min-height: 400px;">
+                                <%--<img id="blah" src="#" alt="your image" />--%>
                                 <asp:Label ID="pictureMessage" runat="server"></asp:Label>
                                 <div class="">
                                     <table id="visib_pictures" class="table">
@@ -463,6 +455,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
+                            <input type="file" id="fileUpload" class="hidden" />
                             <asp:PlaceHolder ID="uploadBtnPlaceholder" runat="server">
                                 <label class="btn btn-default btn-file pull-left btn-sm">
                                     Upload Photo
@@ -500,23 +493,23 @@
                     <h4 class="modal-title">Confirm submission</h4>
                 </div>
                 <div class="modal-body">
-                    <%--Hi! You're visibility report will be submitted for approval. Changes won't be accepted beyond this. Do you wish to continue?--%>
+                    Hi! You're visibility survey will be submitted for approval. Changes won't be accepted beyond this. Do you wish to continue?
                     <asp:UpdatePanel ID="UpdatePanel2" runat="server">
                         <ContentTemplate>
-                            <table class="table">
+                            <table class="table table-condensed">
                                 <thead>
                                     <tr>
-                                        <td>ITEMS</td>
-                                        <td>MEASURES</td>
-                                        <td>HIT</td>
-                                        <td>MISS</td>
+                                        <th>ITEMS</th>
+                                        <th>MEASURES</th>
+                                        <th>HIT</th>
+                                        <th>MISS</th>
                                     </tr>
                                 </thead>
                                 <asp:Repeater ID="confirmParent" runat="server" OnItemDataBound="confirmParent_ItemDataBound">
                                     <ItemTemplate>
                                         <tbody>
                                             <tr>
-                                                <td rowspan="3" class="col-md-5">
+                                                <td rowspan="2" class="col-md-5">
                                                     <address>
                                                         <br />
                                                         <strong><%# DataBinder.Eval(Container.DataItem, "itemCode") %><asp:HiddenField ID="HiddenFieldId1" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "id") %>' />
@@ -531,7 +524,13 @@
                                             <asp:Repeater ID="confirmChild" runat="server" OnItemDataBound="confirmChild_ItemDataBound">
                                                 <ItemTemplate>
                                                     <tr>
-                                                        <td class="custom-row-1"><%# Eval("name") %><asp:HiddenField ID="HiddenFieldId2" runat="server" Value='<%# Eval("id") %>' />
+                                                        <td class="custom-row-1">
+                                                            <br />
+                                                            <br />
+                                                            <%# Eval("name") %><br />
+                                                            <br />
+                                                            <br />
+                                                            <asp:HiddenField ID="HiddenFieldId2" runat="server" Value='<%# Eval("id") %>' />
                                                         </td>
                                                         <td class="custom-row-1">
                                                             <asp:Label ID="hit" runat="server" Text=""></asp:Label>
@@ -552,7 +551,7 @@
                 <div class="modal-footer">
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Cancel</button>
-                        <asp:Button ID="confirmSubmitBtn" runat="server" Text="Submit" OnClick="confirmSubmitBtn_Click" CssClass="btn btn-success btn-sm" />
+                        <asp:Button ID="confirmSubmitBtn" runat="server" Text="Submit" OnClientClick="$('#confirmModal').modal('hide');" OnClick="confirmSubmitBtn_Click" CssClass="btn btn-success btn-sm" />
                     </div>
                 </div>
             </div>
@@ -593,30 +592,7 @@
 
     <script type="text/javascript">
 
-        //$(document).on('change', 'input.imgInp', function () {
-        //    var input = $(this)[0];
-        //    var target = "";
-        //    var render = "";
-
-        //    debugger;
-        //    var img = $(this).closest('td').find("img.blah");
-
-        //    if (input.files && input.files[0]) {
-        //        var reader = new FileReader();
-
-        //        reader.onload = function (e) {
-        //            target = e.target.result;
-        //            img.attr('src', target);
-        //        }
-        //        render = reader.readAsDataURL(input.files[0]);
-        //    }
-        //});
-
         $("input.imgInp").change(function () {
-
-            //$table = $(this).parents(".modal-dialog").find('.modal-body').find('.table').find('tbody').find('tr:last')
-            //.after()
-
 
             debugger;
             var img = $(this).closest('td').find("img.blah");
@@ -624,21 +600,6 @@
             readURL(this, img);
         });
 
-        function readURL(input, img) {
-
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function (e) {
-                    debugger;
-
-                    img.attr("src", e.target.result);
-                    img.css("display", "");
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
 
         $('.modal').on('show.bs.modal', function () {
             $('.modal .modal-body').css('overflow-y', 'auto');
@@ -646,13 +607,7 @@
         });
 
         function UploadFile(btn, input, target) {
-            //var name = 'uploadBtn' + a;
             document.getElementById(btn).click();
-            //document.getElementsByClassName(name)[0].click();
-            //$('.uploadBtn' + a).click();
-            //$(".uploadBtn"+a+"").trigger("click");
-            //$('#' + target).val($(input).val());
-            //alert('success '+$(input).val()+" BTN: "+btn);
         }
 
         function openModal() {
@@ -660,7 +615,6 @@
                 //backdrop: 'static',
                 //keyboard: false
             });
-            //$('.modal-body').css("max-height", "100%");
         }
 
         function alertModal() {
@@ -672,17 +626,7 @@
         }
 
         function refreshModal() {
-
-            <%--$("#<%=myFile.ClientID %>").Validate(
-            {
-                MessageControlId: "<%=myFileValidation.ClientID%>",
-                ValidFileExtensions: ["doc", "docx"]
-            });--%>
-
             $('#<%=refreshBtn.ClientID%>').click();
-        }
-
-        function refreshForm() {
         }
 
         function refreshParent() {
@@ -698,6 +642,7 @@
                 backdrop: 'static',
                 keyboard: false
             });
+            //alert("hello wolrd");
         }
 
         $(document).ready(function () {
@@ -707,13 +652,9 @@
         function radioListener() {
             $('input[type="radio"]').change(function () {
                 if ($(this).attr('value') === 'hitRadio') {
-                    //$(this).closest('td').next('td').next('td').find('.remarksddl').prop('disabled', "true");
                     $(this).closest('td').next('td').find('.remarksddl').prop('disabled', "true");
-                    //$('#ContentPlaceHolder1_parentRepeater_childRepeater_0_remarksDDL_0').prop('disabled', 'true');
                 } else {
                     $(this).closest('.input-group').find('.remarksddl').prop('disabled', "");
-                    //$(this).closest('td').next('td').find('.remarksddl').prop("disabled", "");
-                    //$('#ContentPlaceHolder1_parentRepeater_childRepeater_0_remarksDDL_0').prop('disabled', '');
                 }
             });
         }
@@ -726,39 +667,60 @@
             document.getElementById(ddl).disabled = true;
         }
 
-        function pageLoad() {
+        function initializeSettings() {
 
 
-            Sys.Application.add_load(function () {
-                $('.date').datepicker({
-                    maxDate: new Date
-                });
-
-                $('.remarksddl').each(function () {
-                    if ($(this).closest('td').find('input[type="radio"]').is(':checked')) {
-                        $(this).prop('disabled', '');
-                    } else {
-                        $(this).prop('disabled', 'true');
-                    }
-                });
-
-                $(document).ready(function () {
-                    $('input[type="radio"]').change(function () {
-                        if ($(this).attr('value') === 'hitRadio') {
-                            //$(this).closest('td').next('td').next('td').find('.remarksddl').prop('disabled', "true");
-                            $(this).closest('td').next('td').find('.remarksddl').prop('disabled', "true");
-                            //$('#ContentPlaceHolder1_parentRepeater_childRepeater_0_remarksDDL_0').prop('disabled', 'true');
-                        } else {
-                            $(this).closest('.input-group').find('.remarksddl').prop('disabled', "");
-                            //$(this).closest('td').next('td').find('.remarksddl').prop("disabled", "");
-                            //$('#ContentPlaceHolder1_parentRepeater_childRepeater_0_remarksDDL_0').prop('disabled', '');
-                        }
-                    });
-
-                });
-
+            $('.date').datepicker({
+                maxDate: new Date
             });
 
+            $('.remarksddl').each(function () {
+                if ($(this).closest('td').find('input[type="radio"]').is(':checked')) {
+                    $(this).prop('disabled', '');
+                } else {
+                    $(this).prop('disabled', 'true');
+                }
+            });
+
+            $('input[type="radio"]').change(function () {
+                if ($(this).attr('value') === 'hitRadio') {
+                    //$(this).closest('td').next('td').next('td').find('.remarksddl').prop('disabled', "true");
+                    $(this).closest('td').next('td').find('.remarksddl').prop('disabled', "true");
+                    //$('#ContentPlaceHolder1_parentRepeater_childRepeater_0_remarksDDL_0').prop('disabled', 'true');
+                } else {
+                    $(this).closest('.input-group').find('.remarksddl').prop('disabled', "");
+                    //$(this).closest('td').next('td').find('.remarksddl').prop("disabled", "");
+                    //$('#ContentPlaceHolder1_parentRepeater_childRepeater_0_remarksDDL_0').prop('disabled', '');
+                }
+            });
+
+            $('#fileUpload').on("change", function () {
+                debugger;
+                var img = $("img.blah");
+
+                var filesToUpload = $('#fileupload').files;
+                if (!file.type.match(/image.*/)) {
+
+                }
+
+                //readURL(this);
+            });
+
+            function readURL(input) {
+
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        debugger;
+
+                        $('#blah').attr("src", e.target.result);
+                        //img.css("display", "");
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
         }
 
         function checkExtension(sender, args) {
@@ -784,10 +746,10 @@
         //}
 
         function showAlert() {
-            $("html, body").animate({ scrollTop: 0 }, "slow");
+            $("html, body").animate({ scrollTop: 0 }, "fast");
             window.setTimeout(function () {
                 $("#myAlert").addClass("in");
-            }, 700);
+            }, 200);
             return false;
         }
 

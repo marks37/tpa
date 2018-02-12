@@ -1,9 +1,10 @@
 ﻿<%@ Page Title="Visibility" Language="C#" MasterPageFile="~/VisibilityMain.master" AutoEventWireup="true" CodeFile="coor_visibility.aspx.cs" Inherits="Visibility" %>
 
-<%@ MasterType VirtualPath="~/VisibilityMain.master" %>
+<%@ Register Assembly="DevExpress.Web.v17.1, Version=17.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Web" TagPrefix="dx" %>
 
-<%@ Register Assembly="DevExpress.Web.v14.1, Version=14.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Web.ASPxGridView" TagPrefix="dx" %>
-<%@ Register Assembly="DevExpress.Web.v14.1, Version=14.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Web.ASPxEditors" TagPrefix="dx" %>
+<%@ Register Assembly="DevExpress.Web.v17.1, Version=17.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Data.Linq" TagPrefix="dx" %>
+
+<%@ MasterType VirtualPath="~/VisibilityMain.master" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <style>
@@ -119,18 +120,18 @@
     <div id="lower-navbar" class="">
         <div class="container-fluid">
             <div class="pull-left">
-                <span style="font-size: 100%;">My Visits</span>
+                <span style="font-size: 100%;">Surveys</span>
             </div>
             <div class="pull-right">
                 <div class="" role="toolbar">
-                    <div class="btn-group" role="group">
+                    <div class="btn-group hidden" role="group">
                         <a class="active btn btn-default btn-sm disabled">All</a>
                         <a class="btn btn-default btn-sm disabled">Pending</a>
                         <a class="btn btn-default btn-sm disabled">Submitted</a>
                         <a class="btn btn-default btn-sm disabled">Missed</a>
                     </div>
                     &nbsp;
-                    <div class="btn-group" role="group">
+                    <div class="btn-group hidden" role="group">
                         <asp:LinkButton ID="prevBtn" CssClass="btn btn-sm btn-default disabled" runat="server"><span class="fa fa-chevron-left text-muted"></span></asp:LinkButton>
                         <asp:LinkButton ID="nextBtn" CssClass="btn btn-sm btn-default disabled" runat="server"><span class="fa fa-chevron-right text-muted"></span></asp:LinkButton>
                     </div>
@@ -157,59 +158,88 @@
         </div>
     </div>
     <div class="" id="main-content-wrapper">
-        <br />
         <div class="container-fluid">
-            <div class="">
-                <div class="">
-                    <table class="table table-hover test-tbl" id="visib">
-                        <thead>
-                            <tr class="">
-                                <th class="text-muted">Branch</th>
-                                <th class="text-muted">Call Date</th>
-                                <th class="text-muted">Due</th>
-                                <th class="text-muted hidden">Reference</th>
-                                <th class="text-muted">Status</th>
-                                <th class="text-muted text-right"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <asp:Repeater ID="workplans_rptr" runat="server" OnItemDataBound="workplans_rptr_ItemDataBound" OnItemCommand="workplans_rptr_ItemCommand">
-                                <ItemTemplate>
-                                    <tr class="" runat="server" id="tablerow">
-                                        <td>
-                                            <asp:Label ID="branchlbl" runat="server" Text="">
-                                    <%# DataBinder.Eval(Container.DataItem, "branchCode") %>&nbsp;
-                                    <%# DataBinder.Eval(Container.DataItem, "branchName") %>
-                                            </asp:Label>
-                                        </td>
-                                        <td>
-                                            <asp:Label ID="calldatelbl" runat="server" Text=""></asp:Label>
-                                        </td>
-                                        <td>
-                                            <asp:Label ID="deadlinelbl" runat="server" Text=""></asp:Label>
-                                        </td>
-                                        <td class="hidden">
-                                            <%# DataBinder.Eval(Container.DataItem, "reference") %>
-                                        </td>
-                                        <td>
-                                            <asp:Label ID="statuslbl" runat="server" Text=""></asp:Label>
-                                            <%--<span class="label label-primary"><%# DataBinder.Eval(Container.DataItem, "status") %></span>--%>
-                                            <%--<span class="label label-warning">Required</span>--%>
-                                        </td>
-                                        <td class="text-center">
-                                            <%--<a class="btn btn-default btn-sm" href="view_visibility.aspx?pk=<%# DataBinder.Eval(Container.DataItem, "id") %>">View</a>--%>
-                                            <asp:LinkButton ID="viewBtn" runat="server" CssClass="btn btn-sm btn-link" CommandName="view" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "id") %>'>View</asp:LinkButton>
-                                        </td>
-                                    </tr>
-                                </ItemTemplate>
-                            </asp:Repeater>
-                        </tbody>
-                    </table>
+            <br />
+            <dx:EntityServerModeDataSource ID="EntityServerModeDataSource1" runat="server" ContextTypeName="Entities" TableName="vw_visibility_surveys" OnSelecting="EntityServerModeDataSource1_Selecting" />
+
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <dx:ASPxButtonEdit ID="ASPxButtonEdit1" runat="server" EnableTheming="True" Theme="Material" Width="100%" AutoCompleteType="Disabled" Caption="Search">
+                            <Buttons>
+                                <dx:EditButton ClientVisible="False" Enabled="False">
+                                </dx:EditButton>
+                            </Buttons>
+                            <ClearButton DisplayMode="Always">
+                            </ClearButton>
+                        </dx:ASPxButtonEdit>
+                    </div>
                 </div>
             </div>
+
+            <dx:ASPxGridView ID="ASPxGridView1" runat="server" AutoGenerateColumns="False" DataSourceID="EntityServerModeDataSource1" EnableTheming="True" KeyFieldName="id" Theme="Material" Width="100%" OnCustomButtonCallback="ASPxGridView1_CustomButtonCallback">
+                <ClientSideEvents EndCallback="function(s, e) {
+	adjustGV()
+}" />
+                <SettingsPager AlwaysShowPager="True" PageSize="50">
+                    <PageSizeItemSettings Items="50, 100, 200" Visible="True">
+                    </PageSizeItemSettings>
+                </SettingsPager>
+                <Settings VerticalScrollableHeight="300" VerticalScrollBarMode="Visible" ShowHeaderFilterButton="True" />
+                <SettingsBehavior AllowEllipsisInText="True" AllowFocusedRow="True" />
+                <SettingsSearchPanel CustomEditorID="ASPxButtonEdit1" />
+                <Columns>
+                    <dx:GridViewDataTextColumn Caption="Survey No." FieldName="id" ReadOnly="True" VisibleIndex="1" SortIndex="0" SortOrder="Descending">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataDateColumn Caption="Call Date" FieldName="call_date" VisibleIndex="2">
+                    </dx:GridViewDataDateColumn>
+                    <dx:GridViewDataTextColumn Caption="Branch Name" FieldName="branch_name" VisibleIndex="4" Width="25%">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataTextColumn Caption="Account Group" FieldName="account_group_1" VisibleIndex="5">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataTextColumn Caption="Status" FieldName="status" VisibleIndex="7">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataTextColumn Caption="Branch Code" FieldName="branch_code" VisibleIndex="3">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataDateColumn Caption="Due" FieldName="deadline" VisibleIndex="8">
+                    </dx:GridViewDataDateColumn>
+                    <dx:GridViewCommandColumn VisibleIndex="0" Width="4%">
+                        <CustomButtons>
+                            <dx:GridViewCommandColumnCustomButton ID="viewBtn" Text="View">
+                            </dx:GridViewCommandColumnCustomButton>
+                        </CustomButtons>
+                    </dx:GridViewCommandColumn>
+                </Columns>
+                <Styles>
+                    <Header Font-Size="10pt">
+                        <Paddings PaddingBottom="7px" PaddingLeft="2px" PaddingRight="2px" PaddingTop="7px" />
+                    </Header>
+                    <AlternatingRow Enabled="True">
+                    </AlternatingRow>
+                    <Cell Font-Size="10pt">
+                        <Paddings PaddingBottom="5px" PaddingLeft="2px" PaddingRight="2px" PaddingTop="5px" />
+                    </Cell>
+                    <PagerBottomPanel>
+                        <Paddings PaddingBottom="2px" PaddingLeft="2px" PaddingRight="2px" PaddingTop="2px" />
+                    </PagerBottomPanel>
+                    <CommandColumn>
+                        <Paddings Padding="2px" />
+                    </CommandColumn>
+                </Styles>
+            </dx:ASPxGridView>
+
         </div>
         <footer class="">
-            <br />
             <br />
             <div class="container-fluid">
                 <p class="text-muted text-right">Developed by: <a href="#">BSDGSYS</a>. 2017</p>
@@ -302,6 +332,28 @@
             $('#myModal').modal('hide');
         }
 
+        function adjustGV() {
+            window.onload = function () {
+                $('.dxgvCSD').css("width", "100%");
+                $('.dxgvControl_Material .dxgvCSD').css("padding-right", "0");
+                $('.dxgvCSD').css("padding-right", "0");
+            };
+
+            $(window).resize(function () {
+                setTimeout(function () {
+                    $('.dxgvCSD').css("width", "100%");
+                    $('.dxgvControl_Material .dxgvCSD').css("padding-right", "0");
+                    $('.dxgvCSD').css("padding-right", "0");
+                }, 1);
+            });
+
+            $('.dxgvCSD').css("width", "100%");
+            $('.dxgvControl_Material .dxgvCSD').css("padding-right", "0");
+            $('.dxgvCSD').css("padding-right", "0");
+
+            //alert("hello world");
+        }
+
         $(document).ready(function () {
             $('#visib').DataTable({
                 //"paging": false,
@@ -312,6 +364,11 @@
                 }
             });
         });
+
+        function initializeSettings(sender, args) {
+            adjustGV();
+        }
+
     </script>
 </asp:Content>
 

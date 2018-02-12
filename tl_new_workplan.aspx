@@ -85,7 +85,7 @@
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
-    <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
+    <%--<asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>--%>
 
     <div id="lower-navbar" class="" style="line-height: 40px; border-bottom: 1px solid #ddd;">
         <div class="container-fluid">
@@ -115,7 +115,7 @@
         <div class="">
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
-                    <div class="">
+                    <div class="hidden">
                         <div class="">
                             <table class="table table-hover table-condensed" id="test-tbl">
                                 <tbody>

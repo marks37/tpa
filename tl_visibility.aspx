@@ -1,5 +1,9 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/VisibilityMain.master" AutoEventWireup="true" CodeFile="tl_visibility.aspx.cs" Inherits="tl_visibility" %>
 
+<%@ Register Assembly="DevExpress.Web.v17.1, Version=17.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Web" TagPrefix="dx" %>
+
+<%@ Register Assembly="DevExpress.Web.v17.1, Version=17.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Data.Linq" TagPrefix="dx" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <style>
         dl {
@@ -83,7 +87,7 @@
         .table > tbody > tr {
         }
 
-        .table > tbody{
+        .table > tbody {
         }
 
         .select2-container {
@@ -99,7 +103,7 @@
     <div id="lower-navbar">
         <div class="container-fluid">
             <div class="pull-left">
-                <span style="font-size: 100%;" class="text-muted">Visibility</span>
+                <span style="font-size: 100%;" class="text-muted">Surveys</span>
             </div>
             <div class="pull-right">
                 <div class="" role="toolbar">
@@ -126,70 +130,104 @@
     <div class="" id="main-content-wrapper">
         <div class="container-fluid">
             <br />
-            <div class="">
-                <div class="">
-                    <table class="table table-hover test-tbl" id="visib">
-                        <thead>
-                            <tr class="">
-                                <th class="text-muted small">Branch</th>
-                                <th class="text-center text-muted small">Call Date</th>
-                                <th class="text-center text-muted small">Due Date</th>
-                                <th class="text-muted small">Coordinator</th>
-                                <th class="text-left text-muted small col-md-1">Status</th>
-                                <th class="text-muted text-right small"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <asp:Repeater ID="workplan_rptr" runat="server" OnItemDataBound="workplan_rptr_ItemDataBound" OnItemCommand="workplan_rptr_ItemCommand">
-                                <ItemTemplate>
-                                    <tr class="">
-                                        <td>
-                                            <asp:Label ID="branchlbl" runat="server" Text="">
-                                            </asp:Label>
-                                        </td>
-                                        <td class="text-center">
-                                            <asp:Label ID="calldatelbl" runat="server" Text=""></asp:Label>
-                                        </td>
-                                        <td class="text-center">
-                                            <asp:Label ID="deadlinelbl" runat="server" Text=""></asp:Label>
-                                        </td>
-                                        <td>
-                                            <asp:Label ID="coordinatorlbl" runat="server" Text=""></asp:Label>
-                                        </td>
-                                        <td class="text-left">
-                                            <asp:Label ID="statuslbl" runat="server" Text=""></asp:Label>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-group">
-                                                <asp:LinkButton ID="viewBtn" runat="server" CssClass="btn btn-link" CommandName="view" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "id") %>'>View</asp:LinkButton>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </ItemTemplate>
-                            </asp:Repeater>
-                        </tbody>
-                    </table>
+
+            <dx:EntityServerModeDataSource ID="EntityServerModeDataSource1" runat="server" OnSelecting="EntityServerModeDataSource1_Selecting" ContextTypeName="Entities" TableName="vw_visibility_surveys_tl" />
+
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <dx:ASPxButtonEdit ID="ASPxButtonEdit1" runat="server" EnableTheming="True" Theme="Material" Width="100%" AutoCompleteType="Disabled" Caption="Search">
+                            <Buttons>
+                                <dx:EditButton ClientVisible="False" Enabled="False">
+                                </dx:EditButton>
+                            </Buttons>
+                            <ClearButton DisplayMode="Always">
+                            </ClearButton>
+                        </dx:ASPxButtonEdit>
+                    </div>
                 </div>
             </div>
+
+            <dx:ASPxGridView ID="ASPxGridView1" runat="server" AutoGenerateColumns="False" DataSourceID="EntityServerModeDataSource1" EnableTheming="True" KeyFieldName="id" Theme="Material" Width="100%" OnCustomButtonCallback="ASPxGridView1_CustomButtonCallback">
+                <ClientSideEvents EndCallback="function(s, e) {
+adjustGV();
+}" />
+                <SettingsPager PageSize="50">
+                    <PageSizeItemSettings Items="50, 100, 200" Visible="True">
+                    </PageSizeItemSettings>
+                </SettingsPager>
+                <Settings VerticalScrollableHeight="300" VerticalScrollBarMode="Visible" ShowHeaderFilterButton="True" />
+                <SettingsBehavior AllowEllipsisInText="True" AllowFocusedRow="True" />
+                <SettingsSearchPanel CustomEditorID="ASPxButtonEdit1" />
+                <Columns>
+                    <dx:GridViewDataTextColumn Caption="Survey No." FieldName="id" ReadOnly="True" VisibleIndex="1" SortIndex="0" SortOrder="Descending">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataTextColumn FieldName="branch_name" VisibleIndex="4" Caption="Branch Name" Width="25%">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataTextColumn Caption="Branch Code" FieldName="branch_code" VisibleIndex="3">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataTextColumn Caption="Account Group" FieldName="account_group_1" VisibleIndex="5">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataTextColumn Caption="Status" FieldName="status" VisibleIndex="9">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataDateColumn Caption="Due" FieldName="deadline" VisibleIndex="12">
+                    </dx:GridViewDataDateColumn>
+                    <dx:GridViewDataTextColumn Caption="Assigned" FieldName="fullname" VisibleIndex="8">
+                        <SettingsHeaderFilter Mode="CheckedList">
+                        </SettingsHeaderFilter>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewCommandColumn ShowInCustomizationForm="True" VisibleIndex="0" Width="4%">
+                        <CustomButtons>
+                            <dx:GridViewCommandColumnCustomButton ID="viewBtn" Text="View">
+                            </dx:GridViewCommandColumnCustomButton>
+                        </CustomButtons>
+                    </dx:GridViewCommandColumn>
+                    <dx:GridViewDataDateColumn Caption="Call Date" FieldName="call_date" VisibleIndex="2">
+                    </dx:GridViewDataDateColumn>
+                </Columns>
+                <Styles>
+                    <Header Font-Size="10pt">
+                        <Paddings PaddingBottom="7px" PaddingLeft="2px" PaddingRight="2px" PaddingTop="7px" />
+                    </Header>
+                    <AlternatingRow Enabled="True">
+                    </AlternatingRow>
+                    <Cell Font-Size="10pt">
+                        <Paddings PaddingBottom="5px" PaddingLeft="2px" PaddingRight="2px" PaddingTop="5px" />
+                    </Cell>
+                    <Footer Font-Size="10pt">
+                    </Footer>
+                    <PagerBottomPanel Font-Size="10pt">
+                        <Paddings Padding="2px" />
+                    </PagerBottomPanel>
+                    <CommandColumn>
+                        <Paddings PaddingBottom="2px" PaddingLeft="2px" PaddingRight="2px" PaddingTop="2px" />
+                    </CommandColumn>
+                </Styles>
+            </dx:ASPxGridView>
         </div>
         <footer class="">
-            <br />
-            <br />
             <div class="container-fluid">
+                <br />
                 <p class="text-muted text-right">Developed by: <a href="#">BSDGSYS</a>. 2017</p>
             </div>
             <br />
         </footer>
     </div>
     <script type="text/javascript">
-        function pageLoad() {
-
-
-
-
-        }
 
         $(document).ready(function () {
+            adjustGV();
+
             $('#visib').DataTable({
                 //"paging": false,
                 "ordering": false,
@@ -199,6 +237,34 @@
                 }
             });
         });
+
+        function adjustGV() {
+            window.onload = function () {
+                $('.dxgvCSD').css("width", "100%");
+                $('.dxgvControl_Material .dxgvCSD').css("padding-right", "0");
+                $('.dxgvCSD').css("padding-right", "0");
+            };
+
+            $(window).resize(function () {
+                setTimeout(function () {
+                    $('.dxgvCSD').css("width", "100%");
+                    $('.dxgvControl_Material .dxgvCSD').css("padding-right", "0");
+                    $('.dxgvCSD').css("padding-right", "0");
+                }, 1);
+            });
+
+            $('.dxgvCSD').css("width", "100%");
+            $('.dxgvControl_Material .dxgvCSD').css("padding-right", "0");
+            $('.dxgvCSD').css("padding-right", "0");
+
+            //alert("hello world");
+        }
+
+        function initializeSettings(sender, args) {
+            adjustGV();
+        }
+
+
     </script>
 </asp:Content>
 

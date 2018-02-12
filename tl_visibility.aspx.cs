@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevExpress.Web;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -30,11 +31,12 @@ public partial class tl_visibility : System.Web.UI.Page
         var visibLink = (HtmlGenericControl)this.Master.FindControl("visibLink");
         visibLink.Attributes.Add("class", "active");
 
-        List<clsWorkplan> workplanList = DBLayer.getWorkplansTLVisibilityByUserId(user.Id);
+        //List<clsWorkplan> workplanList = DBLayer.getWorkplansTLVisibilityByUserId(user.Id);
+
         if (!IsPostBack)
         {
-            workplan_rptr.DataSource = workplanList;
-            workplan_rptr.DataBind();
+            //workplan_rptr.DataSource = workplanList;
+            //workplan_rptr.DataBind();
         }
 
     }
@@ -68,9 +70,9 @@ public partial class tl_visibility : System.Web.UI.Page
                 statuslbl.Text = workplan.Status;
                 statuslbl.CssClass += " label label-warning";
             }
-            
+
             Label deadlinelbl = (Label)e.Item.FindControl("deadlinelbl");
-            DateTime deadline = DateTime.Parse(workplan.Deadline);            
+            DateTime deadline = DateTime.Parse(workplan.Deadline);
             deadlinelbl.Text = deadline.ToString("MM.dd.yyyy");
 
             if (!workplan.Deadline.Equals("") && !workplan.Status.Equals("Submitted"))
@@ -116,8 +118,70 @@ public partial class tl_visibility : System.Web.UI.Page
                 log.Activity = "viewed visit::" + workplanId;
                 DBLayer.addNewActivityLog(log);
 
-            }            
+            }
             Response.Redirect("~/view_visibility.aspx?pk=" + workplanId);
         }
+    }
+
+    protected void EntityServerModeDataSource1_Selecting(object sender, DevExpress.Data.Linq.LinqServerModeDataSourceSelectEventArgs e)
+    {
+        clsUser user = (clsUser)Session["user"];
+        int userId = int.Parse(user.Id);
+        
+        //IQueryable<vw_visibility_surveys_tl> query = new Entities().vw_visibility_surveys_tl;
+        //query = query.Where(p => p.assigned == userId).OrderBy(x => x.id);
+        //e.QueryableSource = query;
+
+        Entities context = new Entities();
+
+        //var surveys = context.vw_visibility_surveys_tl.Where(p=>p.assigned==userId);
+        var surveys = from d1 in context.vw_visibility_surveys_tl
+                      where d1.assigned == userId
+                      select d1;
+
+        //var assignedUsers = context.sp_getAssignedUsers(userId).ToList();
+        //var assignedSurveys = from d1 in surveys
+        //                      join d2 in assignedUsers on d1.user_id equals d2.id
+        //                      select new {
+        //                      d1.account_group_1,
+        //                      d1.added_by,
+        //                      d1.assigned,
+        //                      d1.branch_code,
+        //                      d1.branch_id,
+        //                      d1.branch_name,
+        //                      d1.call_date,
+        //                      d1.date_created,
+        //                      d1.date_submitted,
+        //                      d1.deadline,
+        //                      d1.fullname,
+        //                      d1.id,
+        //                      d1.is_deleted,
+        //                      d1.reference,
+        //                      d1.status,
+        //                      d1.user_id,
+        //                      d1.viewed_at
+        //                      };
+
+
+        e.QueryableSource = surveys;
+
+    }
+
+    protected void ASPxGridView1_CustomButtonCallback(object sender, DevExpress.Web.ASPxGridViewCustomButtonCallbackEventArgs e)
+    {
+        int workplanId = (int)(sender as ASPxGridView).GetRowValues(e.VisibleIndex, "id");
+        string target_url = "~/view_visibility.aspx?pk=" + workplanId;
+        if (e.ButtonID == "viewBtn")
+        {
+            if (Page.IsCallback)
+            {
+                ASPxWebControl.RedirectOnCallback(target_url);
+            }
+            else
+            {
+                Response.Redirect(target_url);
+            }
+        }
+
     }
 }

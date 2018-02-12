@@ -36,6 +36,17 @@ public partial class Site_Login : System.Web.UI.Page
                 Response.Redirect("~/tl_visibility.aspx");
             }
         }
+        else if (Page.Request.QueryString["session"]==("expired"))
+        {
+            string message = "";
+            message += "<div class='alert alert-danger'>";
+            message += "Your session has expired. Please login again";
+            message += "</div>";
+            invalidLogin.Text = message;
+        }
+
+
+
     }
     protected void loginBtn_Click(object sender, EventArgs e)
     {

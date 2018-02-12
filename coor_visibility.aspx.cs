@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevExpress.Web;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -33,8 +34,10 @@ public partial class Visibility : System.Web.UI.Page
         
         if (!IsPostBack)
         {
-            workplans_rptr.DataSource = workplanList;
-            workplans_rptr.DataBind();
+            var visibLink = (HtmlGenericControl)this.Master.FindControl("visibLink");
+            visibLink.Attributes.Add("class", "active");
+            //workplans_rptr.DataSource = workplanList;
+            //workplans_rptr.DataBind();
 
             List<clsManpower> branches = DBLayer.getAssignedBranches(user.Id);
             foreach (clsManpower branch in branches)
@@ -313,6 +316,70 @@ public partial class Visibility : System.Web.UI.Page
             }   
 
             Response.Redirect("~/view_visibility.aspx?pk=" + workplanId);
+        }
+    }
+    protected void EntityServerModeDataSource1_Selecting(object sender, DevExpress.Data.Linq.LinqServerModeDataSourceSelectEventArgs e)
+    {
+        clsUser user = (clsUser)Session["user"];
+        IQueryable<vw_visibility_surveys> query = new Entities().vw_visibility_surveys;
+        int userId = int.Parse(user.Id);
+        DateTime lastDay = new DateTime(DBLayer.GetCurrentTime().Year, DBLayer.GetCurrentTime().Month, DateTime.DaysInMonth(DBLayer.GetCurrentTime().Year,DBLayer.GetCurrentTime().Month));
+        query = query.Where(p => (p.user_id == userId) && (p.call_date<=lastDay)).OrderBy(x => x.id);
+        e.QueryableSource = query;
+    }
+    protected void ASPxGridView1_CustomButtonCallback(object sender, DevExpress.Web.ASPxGridViewCustomButtonCallbackEventArgs e)
+    {
+        int workplanId = (int)(sender as ASPxGridView).GetRowValues(e.VisibleIndex, "id");
+        string target_url = "~/view_visibility.aspx?pk=" + workplanId;
+        if (e.ButtonID == "viewBtn")
+        {
+
+            clsWorkplan workplan = DBLayer.viewWorkplan(workplanId.ToString());
+            List<clsVisibilitySurvey> surveyList = DBLayer.getVisibilitySurveysByWorkplanId(workplan.Id);
+            if (surveyList.Count() == 0)
+            {
+                List<clsVisibility> visibilityList = DBLayer.getVisibilityProgramsByBranchId(workplan.BranchId);
+                foreach (clsVisibility visib in visibilityList)
+                {
+                    clsVisibilitySurvey survey = new clsVisibilitySurvey();
+                    survey.VisibilityId = visib.Id;
+                    survey.WorkplanId = workplanId.ToString();
+                    survey.DateCreated = GetCurrentTime().ToString();
+
+                    List<clsVisibilityResponse> responseList = new List<clsVisibilityResponse>();
+                    foreach (clsVisibilityStandard standard in visib.Standard)
+                    {
+                        clsVisibilityResponse response = new clsVisibilityResponse();
+                        response.Standard = standard.Id;
+                        response.DateCreated = GetCurrentTime().ToString();
+                        response.Remarks = "";
+                        responseList.Add(response);
+                    }
+                    survey.Response = responseList;
+                    DBLayer.addVisibilitySurvey(survey);
+                }
+            }
+            clsUser user = (clsUser)Session["user"];
+            if (user != null)
+            {
+                clsActivityLog log = new clsActivityLog();
+                log.Username = user.Username;
+                log.DateCreated = DBLayer.GetCurrentTime().ToString();
+                log.PageUrl = HttpContext.Current.Request.Url.AbsolutePath;
+                log.Activity = "viewed visit::" + workplanId;
+                DBLayer.addNewActivityLog(log);
+
+            }   
+
+
+            if (Page.IsCallback)
+            {
+                ASPxWebControl.RedirectOnCallback(target_url);
+            }
+            else
+            {
+                Response.Redirect(target_url);
+            }
         }
     }
 }

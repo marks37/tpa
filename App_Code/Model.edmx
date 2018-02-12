@@ -1,0 +1,481 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Visibility_System_DatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Data_User_Activity_Log">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="username" Type="nvarchar(max)" />
+          <Property Name="pageUrl" Type="nvarchar(max)" />
+          <Property Name="activity" Type="nvarchar(max)" />
+          <Property Name="dateCreated" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Data_Workplan">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="call_date" Type="date" />
+          <Property Name="branch_id" Type="int" />
+          <Property Name="is_deleted" Type="int" />
+          <Property Name="user_id" Type="int" />
+          <Property Name="status" Type="nvarchar" MaxLength="50" />
+          <Property Name="date_created" Type="datetime" />
+          <Property Name="date_submitted" Type="datetime" />
+          <Property Name="deadline" Type="datetime" />
+          <Property Name="added_by" Type="int" />
+          <Property Name="reference" Type="nvarchar" MaxLength="50" />
+          <Property Name="viewed_at" Type="datetime" />
+          <Property Name="modified_by" Type="int" />
+          <Property Name="date_modified" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Ref_User">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="username" Type="nvarchar(max)" />
+          <Property Name="password" Type="nvarchar(max)" />
+          <Property Name="fullname" Type="nvarchar(max)" />
+          <Property Name="firstname" Type="nvarchar(max)" />
+          <Property Name="middle" Type="nvarchar(max)" />
+          <Property Name="lastname" Type="nvarchar(max)" />
+          <Property Name="type" Type="nvarchar(max)" />
+          <Property Name="area" Type="nvarchar(max)" />
+          <Property Name="is_active" Type="float" />
+          <Property Name="email" Type="nvarchar(max)" />
+          <Property Name="agency" Type="nvarchar(max)" />
+          <Property Name="team_leader" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'DB_A1321A_visibsandbox.dbo.vw_data_workplan_tl' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vw_data_workplan_tl">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="call_date" Type="date" />
+          <Property Name="branch_id" Type="int" />
+          <Property Name="branch_name" Type="nvarchar(max)" />
+          <Property Name="branch_code" Type="nvarchar(max)" />
+          <Property Name="account_group_1" Type="nvarchar(max)" />
+          <Property Name="is_deleted" Type="int" />
+          <Property Name="user_id" Type="int" />
+          <Property Name="fullname" Type="nvarchar(max)" />
+          <Property Name="status" Type="nvarchar" MaxLength="50" />
+          <Property Name="date_created" Type="datetime" />
+          <Property Name="date_submitted" Type="datetime" />
+          <Property Name="deadline" Type="datetime" />
+          <Property Name="added_by" Type="int" />
+          <Property Name="team_leader" Type="int" />
+          <Property Name="reference" Type="nvarchar" MaxLength="50" />
+          <Property Name="viewed_at" Type="datetime" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'DB_A1321A_visibsandbox.dbo.vw_visibility_surveys' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vw_visibility_surveys">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="call_date" Type="date" />
+          <Property Name="branch_id" Type="int" />
+          <Property Name="branch_name" Type="nvarchar(max)" />
+          <Property Name="branch_code" Type="nvarchar(max)" />
+          <Property Name="account_group_1" Type="nvarchar(max)" />
+          <Property Name="is_deleted" Type="int" />
+          <Property Name="user_id" Type="int" />
+          <Property Name="status" Type="nvarchar" MaxLength="50" />
+          <Property Name="date_created" Type="datetime" />
+          <Property Name="date_submitted" Type="datetime" />
+          <Property Name="deadline" Type="datetime" />
+          <Property Name="added_by" Type="int" />
+          <Property Name="reference" Type="nvarchar" MaxLength="50" />
+          <Property Name="viewed_at" Type="datetime" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'DB_A1321A_visibsandbox.dbo.vw_visibility_surveys_tl' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vw_visibility_surveys_tl">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="call_date" Type="date" />
+          <Property Name="branch_id" Type="int" />
+          <Property Name="branch_name" Type="nvarchar(max)" />
+          <Property Name="branch_code" Type="nvarchar(max)" />
+          <Property Name="account_group_1" Type="nvarchar(max)" />
+          <Property Name="is_deleted" Type="int" />
+          <Property Name="user_id" Type="int" />
+          <Property Name="fullname" Type="nvarchar(max)" />
+          <Property Name="status" Type="nvarchar" MaxLength="50" />
+          <Property Name="date_created" Type="datetime" />
+          <Property Name="date_submitted" Type="datetime" />
+          <Property Name="deadline" Type="datetime" />
+          <Property Name="added_by" Type="int" />
+          <Property Name="reference" Type="nvarchar" MaxLength="50" />
+          <Property Name="viewed_at" Type="datetime" />
+          <Property Name="assigned" Type="int" />
+        </EntityType>
+        <EntityContainer Name="Visibility_System_DatabaseModelStoreContainer">
+          <EntitySet Name="Data_User_Activity_Log" EntityType="Self.Data_User_Activity_Log" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Data_Workplan" EntityType="Self.Data_Workplan" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ref_User" EntityType="Self.Ref_User" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vw_data_workplan_tl" EntityType="Self.vw_data_workplan_tl" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_data_workplan_tl].[id] AS [id], 
+    [vw_data_workplan_tl].[call_date] AS [call_date], 
+    [vw_data_workplan_tl].[branch_id] AS [branch_id], 
+    [vw_data_workplan_tl].[branch_name] AS [branch_name], 
+    [vw_data_workplan_tl].[branch_code] AS [branch_code], 
+    [vw_data_workplan_tl].[account_group_1] AS [account_group_1], 
+    [vw_data_workplan_tl].[is_deleted] AS [is_deleted], 
+    [vw_data_workplan_tl].[user_id] AS [user_id], 
+    [vw_data_workplan_tl].[fullname] AS [fullname], 
+    [vw_data_workplan_tl].[status] AS [status], 
+    [vw_data_workplan_tl].[date_created] AS [date_created], 
+    [vw_data_workplan_tl].[date_submitted] AS [date_submitted], 
+    [vw_data_workplan_tl].[deadline] AS [deadline], 
+    [vw_data_workplan_tl].[added_by] AS [added_by], 
+    [vw_data_workplan_tl].[team_leader] AS [team_leader], 
+    [vw_data_workplan_tl].[reference] AS [reference], 
+    [vw_data_workplan_tl].[viewed_at] AS [viewed_at]
+    FROM [dbo].[vw_data_workplan_tl] AS [vw_data_workplan_tl]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_visibility_surveys" EntityType="Self.vw_visibility_surveys" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_visibility_surveys].[id] AS [id], 
+    [vw_visibility_surveys].[call_date] AS [call_date], 
+    [vw_visibility_surveys].[branch_id] AS [branch_id], 
+    [vw_visibility_surveys].[branch_name] AS [branch_name], 
+    [vw_visibility_surveys].[branch_code] AS [branch_code], 
+    [vw_visibility_surveys].[account_group_1] AS [account_group_1], 
+    [vw_visibility_surveys].[is_deleted] AS [is_deleted], 
+    [vw_visibility_surveys].[user_id] AS [user_id], 
+    [vw_visibility_surveys].[status] AS [status], 
+    [vw_visibility_surveys].[date_created] AS [date_created], 
+    [vw_visibility_surveys].[date_submitted] AS [date_submitted], 
+    [vw_visibility_surveys].[deadline] AS [deadline], 
+    [vw_visibility_surveys].[added_by] AS [added_by], 
+    [vw_visibility_surveys].[reference] AS [reference], 
+    [vw_visibility_surveys].[viewed_at] AS [viewed_at]
+    FROM [dbo].[vw_visibility_surveys] AS [vw_visibility_surveys]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_visibility_surveys_tl" EntityType="Self.vw_visibility_surveys_tl" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_visibility_surveys_tl].[id] AS [id], 
+    [vw_visibility_surveys_tl].[call_date] AS [call_date], 
+    [vw_visibility_surveys_tl].[branch_id] AS [branch_id], 
+    [vw_visibility_surveys_tl].[branch_name] AS [branch_name], 
+    [vw_visibility_surveys_tl].[branch_code] AS [branch_code], 
+    [vw_visibility_surveys_tl].[account_group_1] AS [account_group_1], 
+    [vw_visibility_surveys_tl].[is_deleted] AS [is_deleted], 
+    [vw_visibility_surveys_tl].[user_id] AS [user_id], 
+    [vw_visibility_surveys_tl].[fullname] AS [fullname], 
+    [vw_visibility_surveys_tl].[status] AS [status], 
+    [vw_visibility_surveys_tl].[date_created] AS [date_created], 
+    [vw_visibility_surveys_tl].[date_submitted] AS [date_submitted], 
+    [vw_visibility_surveys_tl].[deadline] AS [deadline], 
+    [vw_visibility_surveys_tl].[added_by] AS [added_by], 
+    [vw_visibility_surveys_tl].[reference] AS [reference], 
+    [vw_visibility_surveys_tl].[viewed_at] AS [viewed_at], 
+    [vw_visibility_surveys_tl].[assigned] AS [assigned]
+    FROM [dbo].[vw_visibility_surveys_tl] AS [vw_visibility_surveys_tl]</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Visibility_System_DatabaseModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="vw_data_workplan_tl">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="call_date" Type="DateTime" Precision="0" />
+          <Property Name="branch_id" Type="Int32" />
+          <Property Name="branch_name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="branch_code" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="account_group_1" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="is_deleted" Type="Int32" />
+          <Property Name="user_id" Type="Int32" />
+          <Property Name="fullname" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="date_created" Type="DateTime" Precision="3" />
+          <Property Name="date_submitted" Type="DateTime" Precision="3" />
+          <Property Name="deadline" Type="DateTime" Precision="3" />
+          <Property Name="added_by" Type="Int32" />
+          <Property Name="team_leader" Type="Int32" />
+          <Property Name="reference" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="viewed_at" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="vw_data_workplan_tl" EntityType="Self.vw_data_workplan_tl" />
+          <EntitySet Name="Data_Workplan" EntityType="Visibility_System_DatabaseModel.Data_Workplan" />
+          <EntitySet Name="Data_User_Activity_Log" EntityType="Visibility_System_DatabaseModel.Data_User_Activity_Log" />
+          <FunctionImport Name="sp_getWorkplansTLViewByUserId">
+          <Parameter Name="userId" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="vw_visibility_surveys_tl" EntityType="Visibility_System_DatabaseModel.vw_visibility_surveys_tl" />
+          <EntitySet Name="vw_visibility_surveys" EntityType="Visibility_System_DatabaseModel.vw_visibility_surveys" />
+          <FunctionImport Name="sp_getAssignedUsers" ReturnType="Collection(Visibility_System_DatabaseModel.sp_getAssignedUsers_Result)">
+          <Parameter Name="Id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="Ref_User" EntityType="Visibility_System_DatabaseModel.Ref_User" />
+        </EntityContainer>
+        <EntityType Name="Data_Workplan">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="call_date" Type="DateTime" Precision="0" />
+          <Property Name="branch_id" Type="Int32" />
+          <Property Name="is_deleted" Type="Int32" />
+          <Property Name="user_id" Type="Int32" />
+          <Property Name="status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="date_created" Type="DateTime" Precision="3" />
+          <Property Name="date_submitted" Type="DateTime" Precision="3" />
+          <Property Name="deadline" Type="DateTime" Precision="3" />
+          <Property Name="added_by" Type="Int32" />
+          <Property Name="reference" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="viewed_at" Type="DateTime" Precision="3" />
+          <Property Name="date_modified" Type="DateTime" Precision="3" />
+          <Property Name="modified_by" Type="Int32" />
+        </EntityType>
+        <EntityType Name="Data_User_Activity_Log">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="username" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="pageUrl" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="activity" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="dateCreated" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="vw_visibility_surveys_tl">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="call_date" Type="DateTime" Precision="0" />
+          <Property Name="branch_id" Type="Int32" />
+          <Property Name="branch_name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="branch_code" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="account_group_1" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="is_deleted" Type="Int32" />
+          <Property Name="user_id" Type="Int32" />
+          <Property Name="status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="date_created" Type="DateTime" Precision="3" />
+          <Property Name="date_submitted" Type="DateTime" Precision="3" />
+          <Property Name="deadline" Type="DateTime" Precision="3" />
+          <Property Name="added_by" Type="Int32" />
+          <Property Name="reference" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="viewed_at" Type="DateTime" Precision="3" />
+          <Property Name="assigned" Type="Int32" />
+          <Property Name="fullname" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="vw_visibility_surveys">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="call_date" Type="DateTime" Precision="0" />
+          <Property Name="branch_id" Type="Int32" />
+          <Property Name="branch_name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="branch_code" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="account_group_1" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="is_deleted" Type="Int32" />
+          <Property Name="user_id" Type="Int32" />
+          <Property Name="status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="date_created" Type="DateTime" Precision="3" />
+          <Property Name="date_submitted" Type="DateTime" Precision="3" />
+          <Property Name="deadline" Type="DateTime" Precision="3" />
+          <Property Name="added_by" Type="Int32" />
+          <Property Name="reference" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="viewed_at" Type="DateTime" Precision="3" />
+        </EntityType>
+        <ComplexType Name="sp_getAssignedUsers_Result">
+          <Property Type="Int32" Name="id" Nullable="true" />
+          <Property Type="String" Name="username" Nullable="true" />
+          <Property Type="String" Name="password" Nullable="true" />
+          <Property Type="String" Name="fullname" Nullable="true" />
+          <Property Type="String" Name="firstname" Nullable="true" />
+          <Property Type="String" Name="middle" Nullable="true" />
+          <Property Type="String" Name="lastname" Nullable="true" />
+          <Property Type="String" Name="type" Nullable="true" />
+          <Property Type="String" Name="area" Nullable="true" />
+          <Property Type="Double" Name="is_active" Nullable="true" />
+          <Property Type="String" Name="email" Nullable="true" />
+          <Property Type="String" Name="agency" Nullable="true" />
+          <Property Type="Int32" Name="team_leader" Nullable="true" />
+        </ComplexType>
+        <EntityType Name="Ref_User">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="username" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="password" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="fullname" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="firstname" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="middle" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="lastname" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="type" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="area" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="is_active" Type="Double" />
+          <Property Name="email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="agency" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="team_leader" Type="Int32" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Visibility_System_DatabaseModelStoreContainer" CdmEntityContainer="Entities">
+          <EntitySetMapping Name="vw_data_workplan_tl">
+            <EntityTypeMapping TypeName="Visibility_System_DatabaseModel.vw_data_workplan_tl">
+              <MappingFragment StoreEntitySet="vw_data_workplan_tl">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="call_date" ColumnName="call_date" />
+                <ScalarProperty Name="branch_id" ColumnName="branch_id" />
+                <ScalarProperty Name="branch_name" ColumnName="branch_name" />
+                <ScalarProperty Name="branch_code" ColumnName="branch_code" />
+                <ScalarProperty Name="account_group_1" ColumnName="account_group_1" />
+                <ScalarProperty Name="is_deleted" ColumnName="is_deleted" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="fullname" ColumnName="fullname" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="date_created" ColumnName="date_created" />
+                <ScalarProperty Name="date_submitted" ColumnName="date_submitted" />
+                <ScalarProperty Name="deadline" ColumnName="deadline" />
+                <ScalarProperty Name="added_by" ColumnName="added_by" />
+                <ScalarProperty Name="team_leader" ColumnName="team_leader" />
+                <ScalarProperty Name="reference" ColumnName="reference" />
+                <ScalarProperty Name="viewed_at" ColumnName="viewed_at" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Data_Workplan">
+            <EntityTypeMapping TypeName="Visibility_System_DatabaseModel.Data_Workplan">
+              <MappingFragment StoreEntitySet="Data_Workplan">
+                <ScalarProperty Name="modified_by" ColumnName="modified_by" />
+                <ScalarProperty Name="date_modified" ColumnName="date_modified" />
+                <ScalarProperty Name="viewed_at" ColumnName="viewed_at" />
+                <ScalarProperty Name="reference" ColumnName="reference" />
+                <ScalarProperty Name="added_by" ColumnName="added_by" />
+                <ScalarProperty Name="deadline" ColumnName="deadline" />
+                <ScalarProperty Name="date_submitted" ColumnName="date_submitted" />
+                <ScalarProperty Name="date_created" ColumnName="date_created" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="is_deleted" ColumnName="is_deleted" />
+                <ScalarProperty Name="branch_id" ColumnName="branch_id" />
+                <ScalarProperty Name="call_date" ColumnName="call_date" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Data_User_Activity_Log">
+            <EntityTypeMapping TypeName="Visibility_System_DatabaseModel.Data_User_Activity_Log">
+              <MappingFragment StoreEntitySet="Data_User_Activity_Log">
+                <ScalarProperty Name="dateCreated" ColumnName="dateCreated" />
+                <ScalarProperty Name="activity" ColumnName="activity" />
+                <ScalarProperty Name="pageUrl" ColumnName="pageUrl" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_visibility_surveys_tl">
+            <EntityTypeMapping TypeName="Visibility_System_DatabaseModel.vw_visibility_surveys_tl">
+              <MappingFragment StoreEntitySet="vw_visibility_surveys_tl">
+                <ScalarProperty Name="fullname" ColumnName="fullname" />
+                <ScalarProperty Name="assigned" ColumnName="assigned" />
+                <ScalarProperty Name="viewed_at" ColumnName="viewed_at" />
+                <ScalarProperty Name="reference" ColumnName="reference" />
+                <ScalarProperty Name="added_by" ColumnName="added_by" />
+                <ScalarProperty Name="deadline" ColumnName="deadline" />
+                <ScalarProperty Name="date_submitted" ColumnName="date_submitted" />
+                <ScalarProperty Name="date_created" ColumnName="date_created" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="is_deleted" ColumnName="is_deleted" />
+                <ScalarProperty Name="account_group_1" ColumnName="account_group_1" />
+                <ScalarProperty Name="branch_code" ColumnName="branch_code" />
+                <ScalarProperty Name="branch_name" ColumnName="branch_name" />
+                <ScalarProperty Name="branch_id" ColumnName="branch_id" />
+                <ScalarProperty Name="call_date" ColumnName="call_date" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_visibility_surveys">
+            <EntityTypeMapping TypeName="Visibility_System_DatabaseModel.vw_visibility_surveys">
+              <MappingFragment StoreEntitySet="vw_visibility_surveys">
+                <ScalarProperty Name="viewed_at" ColumnName="viewed_at" />
+                <ScalarProperty Name="reference" ColumnName="reference" />
+                <ScalarProperty Name="added_by" ColumnName="added_by" />
+                <ScalarProperty Name="deadline" ColumnName="deadline" />
+                <ScalarProperty Name="date_submitted" ColumnName="date_submitted" />
+                <ScalarProperty Name="date_created" ColumnName="date_created" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="is_deleted" ColumnName="is_deleted" />
+                <ScalarProperty Name="account_group_1" ColumnName="account_group_1" />
+                <ScalarProperty Name="branch_code" ColumnName="branch_code" />
+                <ScalarProperty Name="branch_name" ColumnName="branch_name" />
+                <ScalarProperty Name="branch_id" ColumnName="branch_id" />
+                <ScalarProperty Name="call_date" ColumnName="call_date" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ref_User">
+            <EntityTypeMapping TypeName="Visibility_System_DatabaseModel.Ref_User">
+              <MappingFragment StoreEntitySet="Ref_User">
+                <ScalarProperty Name="team_leader" ColumnName="team_leader" />
+                <ScalarProperty Name="agency" ColumnName="agency" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="is_active" ColumnName="is_active" />
+                <ScalarProperty Name="area" ColumnName="area" />
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="lastname" ColumnName="lastname" />
+                <ScalarProperty Name="middle" ColumnName="middle" />
+                <ScalarProperty Name="firstname" ColumnName="firstname" />
+                <ScalarProperty Name="fullname" ColumnName="fullname" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -10,11 +10,11 @@
 
 
     <link href="Content/bootstrap.min.css" rel="stylesheet" />
-    <link href="Content/font-awesome.css" rel="stylesheet" />
-    <link href="Content/font-awesome.min.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.13/r-2.1.0/datatables.min.css" />
+    <%--    <link href="Content/font-awesome.css" rel="stylesheet" />
+    <link href="Content/font-awesome.min.css" rel="stylesheet" />--%>
     <%--<link href="Content/jquery-ui.css" rel="stylesheet" />--%>
     <%--<script src="Scripts/jquery-ui.js"></script>--%>
+    <script src="https://use.fontawesome.com/47b39e3381.js"></script>
     <link href="Content/awesome-bootstrap-checkbox.css" rel="stylesheet" />
 
     <link href="Content/visibility.css" rel="stylesheet" />
@@ -22,18 +22,31 @@
     <link href="Content/select2-bootstrap.min.css" rel="stylesheet" />
     <link href="Content/select2-bootstrap.css" rel="stylesheet" />
 
-    <link href="Content/custom.css?v=2" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet"/>
+    <link href="Content/custom.css?v=1" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet" />
 
-    <script src="Scripts/jquery-1.12.4.js"></script>
-    <script src="Scripts/select2.min.js"></script>
+
+    <%--<script src="Scripts/jquery-1.12.4.js"></script>--%>
+    <script
+        src="https://code.jquery.com/jquery-1.12.4.min.js"
+        integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
     <script src="Scripts/bootstrap.min.js"></script>
     <link href="Content/jquery-ui.css" rel="stylesheet" />
     <script src="Scripts/jquery-ui.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.13/r-2.1.0/datatables.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.15/b-1.3.1/b-colvis-1.3.1/cr-1.3.3/fc-3.2.2/fh-3.1.2/kt-2.2.1/r-2.1.1/rg-1.0.0/rr-1.2.0/sc-1.4.2/se-1.2.2/datatables.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.15/b-1.3.1/b-colvis-1.3.1/cr-1.3.3/fc-3.2.2/fh-3.1.2/kt-2.2.1/r-2.1.1/rg-1.0.0/rr-1.2.0/sc-1.4.2/se-1.2.2/datatables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.dataTables.min.css" />
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/additional-methods.min.js"></script>
+
+    <link href="Content/bootstrap-modal-carousel.min.css" rel="stylesheet" />
+    <script src="Scripts/bootstrap-modal-carousel.min.js"></script>
+    <script src="Scripts/demo.min.js"></script>
+    <script src="Scripts/AsyncFileUploadValidationPlugin.js"></script>
 
 
     <style>
@@ -44,9 +57,10 @@
 
         body {
             background-color: #F5F5F5;
+            /*background-color: #F0F0F0;*/
             /*padding-top: 150px;
             padding-top: 60px;*/
-            padding-bottom: 20px;
+            /*padding-bottom: 20px;*/
             /*background-color: #eeeeee;*/
             /*background-color: #FAFAFA;*/
             /*font-family: 'Open Sans', sans-serif;*/
@@ -55,7 +69,9 @@
             text-shadow: rgba(0,0,0,.01) 0 0 1px;*/
             height: 100%;
             max-height: 100%;
+            /*font: 14px "Roboto Medium", Helvetica, "Droid Sans", Tahoma, Geneva, sans-serif;*/
         }
+
 
         /* Wrapping element */
         /* Set some basic padding to keep content from hitting the edges */
@@ -282,7 +298,16 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
                 background-color: #283593;
                 height: 40px;
             }
+
+        .select2-results__options .select2-results__options--nested {
+            text-indent: 10px;
+        }
     </style>
+
+    <script type="text/javascript">
+
+        
+    </script>
 
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
@@ -290,6 +315,24 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
 <body>
     <form id="form1" runat="server" enctype="multipart/form-data">
         <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" EnablePageMethods="true"></asp:ScriptManager>
+
+        <div class="modal fade" id="modalSessionTimeoutWarning" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Warning!</h3>
+                    </div>
+                    <div class="modal-body">
+                        <asp:Label ID="lblSessionWarning" runat="server" Text="Your server session is about to expire due to inactivity."></asp:Label>
+                    </div>
+                    <div class="modal-footer">
+                        <asp:Button ID="btnLogoutSession" runat="server" CssClass="btn btn-default" Text="Log out" />
+                        <asp:Button ID="btnContinueSession" runat="server" CssClass="btn btn-primary" Text="Continue working" OnClick="btnContinueSession_Click" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="" id="main_navbar">
             <div class="navbar navbar-default navbar-static-top">
                 <div class="container-fluid">
@@ -308,11 +351,14 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <ul class="nav navbar-nav" id="tabs">
                             <li runat="server" id="visibLink">
-                                <asp:LinkButton ID="visibLinkBtn" runat="server" OnClick="visibLinkBtn_Click">Visibility</asp:LinkButton>
+                                <asp:LinkButton ID="visibLinkBtn" runat="server" OnClick="visibLinkBtn_Click">Surveys</asp:LinkButton>
                             </li>
                             <li runat="server" id="workplanLink"><a href="tl_workplan.aspx">Workplan<span class="sr-only">(current)</span></a></li>
-                            <%--<li><a href="Visibility_Programs.aspx">Programs</a></li>
-                            <li><a href="Visibility_Report.aspx">Reports</a></li>--%>
+                            <%--<li runat="server" id="programLink"><a href="Visibility_Programs.aspx">Programs</a></li>--%>
+                            <%--<li><a href="Visibility_Report.aspx">Reports</a></li>--%>
+                            <li runat="server" id="coorLink"><a href="coordinator.aspx">Coordinator</a></li>
+
+
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
                             <%--<li><a href="Main.aspx">Back to Main Portal</a></li>--%>
@@ -336,12 +382,13 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
                                     <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="change_password.aspx"><i class="fa fa-cog"></i>&nbsp;Change Password</a>
-                                    </li>
-                                    <li role="separator" class="divider"></li>
+                                    <%
+                                    //<li><a href="change_password.aspx"><i class="fa fa-cog"></i>&nbsp;Change Password</a></li>    
+                                    //<li role="separator" class="divider"></li>
+                                    %>
                                     <li>
                                         <asp:LinkButton ID="logoutBtn" runat="server" OnClick="logoutBtn_Click"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Sign out</asp:LinkButton>
+                                        <asp:LinkButton ID="sessionTimeoutBtn" runat="server" CssClass="hidden" OnClick="sessionTimeoutBtn_Click">Session Timeout</asp:LinkButton>
                                     </li>
                                 </ul>
                             </li>
@@ -413,6 +460,38 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
         </div>
 
         <script type="text/javascript">
+
+            //Set timeouts for when the warning message
+            //should be displayed, and what should happen 
+            //when the session actually expires.
+            function pageLoad() {
+                //setTimeout('ShowSessionTimeoutWarning()', '<%=iWarningTimeoutInMilliseconds%>');
+                setTimeout(function () {
+                    //window.location = '<%=sTargetURLForSessionTimeout%>';
+                    $('#<%=sessionTimeoutBtn.ClientID%>').click();
+                }, 120000);
+
+                initializeSettings();
+            }
+
+            //Notify the user that his session is ABOUT to expire.
+            //Do so by making our warning div tag visible.
+            function ShowSessionTimeoutWarning() {
+                $("#modalSessionTimeoutWarning").modal();
+            }
+
+            //Notify the user that his session HAS expired.
+            function ShowSessionExpiredNotification() {
+                $("#modalSessionTimeoutWarning").modal();
+
+                //Send the user to a new page.
+                window.location = '<%=sTargetURLForSessionTimeout%>';
+            }
+
+            function ResetClientSideSessionTimers() {
+                $("#modalSessionTimeoutWarning").modal('hide');
+            }
+
             function extendedValidatorUpdateDisplay(obj) {
                 // Appelle la méthode originale
                 if (typeof originalValidatorUpdateDisplay === "function") {
@@ -452,51 +531,13 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
                 });
             }
 
-            $(document).ready(function () {
-                
-            });
-
-            //function abortPostback(){
-            //    Sys.WebForms.PageRequestManager.getInstance().abortPostBack();
-            //}
-
-            //Sys.WebForms.PageRequestManager.getInstance().add_initializeRequest();
-
-            function validateForm(){
+            function validateForm() {
                 return $("#form1").valid();
-                //if(!isValid){
-                //    //alert("valid: "+isValid);
-                //    return false;
-                //}
             }
 
-            //Sys.Application.add_init(appl_init);
-
-            //function appl_init(){
-            //    var pgRegMgr = sys.WebForms.PageRequestManager.getInstance();
-            //    pgRegMgr.add_beginRequest(validateForm);
-            //}
-
-            <%--Sys.Application.add_load(function() {
-                $("#form1").validate({
-                    debug: true,
-                    rules: {
-                        <%=newPassword.UniqueID%>:
-                        {
-                            required: true,
-                        },
-                    },
-                    messages: {
-                        <%=newPassword.UniqueID%>:
-                        {
-                            required: "Password is required."
-                        },
-                    },
-                    onsubmit: false,
-                });
-            });--%>
-
         </script>
+
+
     </form>
 </body>
 </html>

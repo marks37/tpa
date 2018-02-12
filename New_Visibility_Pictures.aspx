@@ -1,9 +1,4 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/VisibilityMain.master" AutoEventWireup="true" CodeFile="New_Visibility_Pictures.aspx.cs" Inherits="New_Visibility_Pictures" %>
-
-<%@ Register Assembly="DevExpress.Web.v14.1, Version=14.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Web.ASPxFileManager" TagPrefix="dx" %>
-
-<%@ Register Assembly="DevExpress.Web.v14.1, Version=14.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Namespace="DevExpress.Web.ASPxUploadControl" TagPrefix="dx" %>
-
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
@@ -45,9 +40,6 @@
         <a class="btn btn-default pull-right" data-toggle="modal" data-target="#myModal">Upload Pictures</a>
                 <div class="clearfix"></div>
             </div>
-            <dx:ASPxFileManager ID="ASPxFileManager1" runat="server" Visible="false">
-                <Settings RootFolder="~\" ThumbnailFolder="~\Thumb\" />
-            </dx:ASPxFileManager>
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1">
