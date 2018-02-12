@@ -493,6 +493,21 @@ public class clsVisibilityPicture
         set { shelfId = value; }
     }
 
+    private string thumbnailName;
+
+    public string ThumbnailName
+    {
+        get { return thumbnailName; }
+        set { thumbnailName = value; }
+    }
+    private string thumbnailSize;
+
+    public string ThumbnailSize
+    {
+        get { return thumbnailSize; }
+        set { thumbnailSize = value; }
+    }
+
     public clsVisibilityPicture()
     {
 

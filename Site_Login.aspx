@@ -96,7 +96,7 @@
                         <asp:TextBox ID="inputPassword" CssClass="form-control" placeholder="Password" required="trues" runat="server" TextMode="Password"></asp:TextBox>
                     </div>
                     <asp:Label ID="invalidLogin" runat="server" Text=""></asp:Label>
-                    <div class="checkbox hidden">
+                    <div class="checkbox">
                         <label>
                             <asp:CheckBox ID="rememberCheckBox" runat="server" />
                             Remember me

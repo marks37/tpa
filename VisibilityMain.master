@@ -1,5 +1,8 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="VisibilityMain.master.cs" Inherits="Visibility" %>
 
+<%@ Register Src="~/TimeoutControl.ascx" TagPrefix="uc1" TagName="TimeoutControl" %>
+
+
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -315,7 +318,7 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
 <body>
     <form id="form1" runat="server" enctype="multipart/form-data">
         <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" EnablePageMethods="true"></asp:ScriptManager>
-
+        <uc1:TimeoutControl runat="server" ID="TimeoutControl" />
         <div class="modal fade" id="modalSessionTimeoutWarning" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">

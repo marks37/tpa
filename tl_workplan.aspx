@@ -568,10 +568,6 @@
             adjustGV();
 
             var d = new Date();
-
-            var qtr = getQuarter(d);
-            $(".qtr_count").text("Q"+qtr);
-
             d.setDate(d.getDate() - 10);
 
             var dd = d.getDate();
@@ -869,21 +865,20 @@
                     async: true,
                     success: function (response) {
                         var matches = response.d;
-
-                        //$("#myModal").modal("hide");
-                        //$("#myModal").on("hidden.bs.modal", function (e) {
-                        //    //alert("hello world");
-                        //    $("#validateModal").modal("show");
-                        //});
-
-
                         if (matches === "") {
                             isAjaxing = false;
                             SaveWorkplan();
                         } else {
                             $("#workplan_matches_tbl").find("tbody").html(matches);
                             $(".matches_count").html($('#workplan_matches_tbl >tbody>tr').length);
-                            //$('#validateModal').modal('handleUpdate');
+                            var targetDate = new Date($("#callDate").val());
+                            var qtr = getQuarter(targetDate);
+                            var start = new Date(targetDate.getFullYear(), qtr * 3 - 3, 1);
+                            var end = new Date(targetDate.getFullYear(), qtr * 3, 0);
+                            var options = {month: 'short', day: 'numeric', year:'numeric'};
+
+                            $(".qtr_count").text("Q" + qtr + " (" + start.toLocaleDateString('en-US', options) + " - " + end.toLocaleDateString('en-US', options) + ")");
+
                             $('#myModal').one('hidden.bs.modal', function () {
                                 $('#validateModal').modal('show');
                             }).modal('hide');

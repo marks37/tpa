@@ -11,6 +11,7 @@
         <EntityTypeShape EntityType="Visibility_System_DatabaseModel.vw_visibility_surveys_tl" Width="1.5" PointX="5.375" PointY="3.75" />
         <EntityTypeShape EntityType="Visibility_System_DatabaseModel.vw_visibility_surveys" Width="1.5" PointX="0.75" PointY="6.75" />
         <EntityTypeShape EntityType="Visibility_System_DatabaseModel.Ref_User" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="Visibility_System_DatabaseModel.Data_Visibility_Picture" Width="1.5" PointX="7.375" PointY="5.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

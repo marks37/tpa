@@ -787,7 +787,7 @@ FROM [DB_A1321A_visibsandbox].[dbo].[Data_Workplan] as workplan
 LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_Branch] as branch on workplan.branch_id = branch.id
 LEFT JOIN [DB_A1321A_visibsandbox].[dbo].[Ref_User] as users on workplan.user_id = users.id
 WHERE user_id = @userId AND branch_id = @branchId AND ([call_date] BETWEEN @minDate AND @maxDate)
-ORDER BY date_created desc";
+ORDER BY call_date ASC";
 
         myCommand.Parameters.Add("@userId", System.Data.SqlDbType.Int);
         myCommand.Parameters["@userId"].Value = wkplan.UserId;
@@ -2383,78 +2383,101 @@ ORDER BY date_created desc";
     }
 
     //No diff
-    public void addVisibilityPicturesByResponseId(clsVisibilityPicture picture)
+    //public void addVisibilityPicturesByResponseId(clsVisibilityPicture picture)
+    //{
+    //    //string surveyId = "";
+
+    //    SqlConnection myConnection = new SqlConnection();
+    //    SqlCommand myCommand = new SqlCommand();
+
+    //    myConnection.ConnectionString = gConnString;
+    //    myCommand.Connection = myConnection;
+
+    //    myCommand.CommandType = System.Data.CommandType.Text;
+    //    myCommand.CommandText = ("INSERT INTO [dbo].[Data_Visibility_Picture] " +
+    //               "([response_id] " +
+    //               ",[user_id] " +
+    //               ",[name] " +
+    //               ",[file_name] " +
+    //               ",[file_path] " +
+    //               ",[date_captured] " +
+    //               ",[date_created]) " +
+    //               "VALUES " +
+    //               "(@responseId " +
+    //               ",@userId " +
+    //               ",@name " +
+    //               ",@file_name " +
+    //               ",@file_path " +
+    //               ",@date_captured " +
+    //               ",@dateCreated) ");
+
+    //    myCommand.Parameters.Add("@responseId", System.Data.SqlDbType.NVarChar);
+    //    myCommand.Parameters.Add("@userId", System.Data.SqlDbType.NVarChar);
+    //    myCommand.Parameters.Add("@name", System.Data.SqlDbType.NVarChar);
+    //    myCommand.Parameters.Add("@file_name", System.Data.SqlDbType.NVarChar);
+    //    myCommand.Parameters.Add("@file_path", System.Data.SqlDbType.NVarChar);
+    //    myCommand.Parameters.Add("@date_captured", System.Data.SqlDbType.NVarChar);
+    //    myCommand.Parameters.Add("@dateCreated", System.Data.SqlDbType.NVarChar);
+
+    //    myCommand.Parameters["@responseId"].Value = picture.ResponseId;
+    //    myCommand.Parameters["@userId"].Value = picture.Userid;
+    //    myCommand.Parameters["@name"].Value = picture.Name;
+    //    myCommand.Parameters["@file_name"].Value = picture.FileName;
+    //    myCommand.Parameters["@file_path"].Value = picture.FilePath;
+    //    myCommand.Parameters["@date_captured"].Value = picture.DateCaptured;
+    //    myCommand.Parameters["@dateCreated"].Value = picture.DateCreated;
+
+
+
+    //    try
+    //    {
+    //        myConnection.Open();
+    //        SqlDataReader myReader = myCommand.ExecuteReader();
+    //        while (myReader.Read())
+    //        {
+    //            //surveyId = myReader["id"].ToString();
+
+    //        }
+    //        myReader.Close();
+
+    //    }
+    //    catch (Exception objExp)
+    //    {
+    //        throw objExp;
+    //    }
+    //    finally
+    //    {
+    //        if (myConnection != null && myConnection.State != System.Data.ConnectionState.Closed)
+    //        {
+    //            myConnection.Close();
+    //        }
+    //    }
+
+    //    //return surveyId;
+    //}
+
+    public string addVisibilityPicturesByResponseId(clsVisibilityPicture picture)
     {
-        //string surveyId = "";
+        string pictureId = "";
 
-        SqlConnection myConnection = new SqlConnection();
-        SqlCommand myCommand = new SqlCommand();
-
-        myConnection.ConnectionString = gConnString;
-        myCommand.Connection = myConnection;
-
-        myCommand.CommandType = System.Data.CommandType.Text;
-        myCommand.CommandText = ("INSERT INTO [dbo].[Data_Visibility_Picture] " +
-                   "([response_id] " +
-                   ",[user_id] " +
-                   ",[name] " +
-                   ",[file_name] " +
-                   ",[file_path] " +
-                   ",[date_captured] " +
-                   ",[date_created]) " +
-                   "VALUES " +
-                   "(@responseId " +
-                   ",@userId " +
-                   ",@name " +
-                   ",@file_name " +
-                   ",@file_path " +
-                   ",@date_captured " +
-                   ",@dateCreated) ");
-
-        myCommand.Parameters.Add("@responseId", System.Data.SqlDbType.NVarChar);
-        myCommand.Parameters.Add("@userId", System.Data.SqlDbType.NVarChar);
-        myCommand.Parameters.Add("@name", System.Data.SqlDbType.NVarChar);
-        myCommand.Parameters.Add("@file_name", System.Data.SqlDbType.NVarChar);
-        myCommand.Parameters.Add("@file_path", System.Data.SqlDbType.NVarChar);
-        myCommand.Parameters.Add("@date_captured", System.Data.SqlDbType.NVarChar);
-        myCommand.Parameters.Add("@dateCreated", System.Data.SqlDbType.NVarChar);
-
-        myCommand.Parameters["@responseId"].Value = picture.ResponseId;
-        myCommand.Parameters["@userId"].Value = picture.Userid;
-        myCommand.Parameters["@name"].Value = picture.Name;
-        myCommand.Parameters["@file_name"].Value = picture.FileName;
-        myCommand.Parameters["@file_path"].Value = picture.FilePath;
-        myCommand.Parameters["@date_captured"].Value = picture.DateCaptured;
-        myCommand.Parameters["@dateCreated"].Value = picture.DateCreated;
-
-
-
-        try
+        using (var entitiesContext = new Entities())
         {
-            myConnection.Open();
-            SqlDataReader myReader = myCommand.ExecuteReader();
-            while (myReader.Read())
-            {
-                //surveyId = myReader["id"].ToString();
-
-            }
-            myReader.Close();
-
-        }
-        catch (Exception objExp)
-        {
-            throw objExp;
-        }
-        finally
-        {
-            if (myConnection != null && myConnection.State != System.Data.ConnectionState.Closed)
-            {
-                myConnection.Close();
-            }
+            Data_Visibility_Picture pic = new Data_Visibility_Picture();
+            pic.response_id = int.Parse(picture.ResponseId);
+            pic.user_id = int.Parse(picture.Userid);
+            pic.name = picture.Name;
+            pic.file_name = picture.FileName;
+            pic.date_created = DateTime.ParseExact(picture.DateCreated, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            pic.file_path = picture.FilePath;
+            pic.date_captured = DateTime.ParseExact(picture.DateCaptured, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            pic.date_captured2 = DateTime.ParseExact(picture.DateCaptured2, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);  
+            entitiesContext.Data_Visibility_Picture.Add(pic);
+            entitiesContext.SaveChanges();
+            pictureId = pic.id.ToString();
         }
 
-        //return surveyId;
-    } 
+        return pictureId;
+    }
 
     //No diff
     public clsVisibilitySurvey getVisibilitySurveyBySurveyId(string surveyId){
@@ -2750,6 +2773,7 @@ ORDER BY date_created desc";
             }
         }
     }
+
 
     //No diff
     public clsVisibilityShelfBrand getShelfBrand(string shelfId)

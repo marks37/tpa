@@ -13,6 +13,19 @@ public partial class Site_Login : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+
+        if (!String.IsNullOrEmpty(Request.QueryString["expired"]))
+        {
+            if (Request.QueryString["expired"].ToString() == "1")
+            {
+                string message = "";
+                message += "<div class='alert alert-danger'>";
+                message += "Session has expired. Please login again.";
+                message += "</div>";
+                invalidLogin.Text = message;
+            }
+        }
+
         clsUser user = (clsUser)Session["user"];
         if (user != null)
         {
@@ -66,6 +79,17 @@ public partial class Site_Login : System.Web.UI.Page
             //message += "SUCCES FU";
             //invalidLogin.Text = message;
             //FormsAuthentication.RedirectFromLoginPage(user.Username, true);
+            
+            if (rememberCheckBox.Checked)
+            {
+
+            }
+            else
+            {
+                FormsAuthentication.SetAuthCookie(user.Username, false);
+            }
+
+
             log.Username = user.Username;
             log.Activity = "logged in successfully";
             log.DateCreated = DBLayer.GetCurrentTime().ToString();
