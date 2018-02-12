@@ -1,0 +1,503 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="VisibilityMain.master.cs" Inherits="Visibility" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta charset="utf-8" />
+    <%--<meta name="viewport" content="width=device-width, initial-scale=1.0" />--%>
+    <title><%: Page.Title %></title>
+
+
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="Content/font-awesome.css" rel="stylesheet" />
+    <link href="Content/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.13/r-2.1.0/datatables.min.css" />
+    <%--<link href="Content/jquery-ui.css" rel="stylesheet" />--%>
+    <%--<script src="Scripts/jquery-ui.js"></script>--%>
+    <link href="Content/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+
+    <link href="Content/visibility.css" rel="stylesheet" />
+    <link href="Content/select2.min.css" rel="stylesheet" />
+    <link href="Content/select2-bootstrap.min.css" rel="stylesheet" />
+    <link href="Content/select2-bootstrap.css" rel="stylesheet" />
+
+    <link href="Content/custom.css?v=2" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet"/>
+
+    <script src="Scripts/jquery-1.12.4.js"></script>
+    <script src="Scripts/select2.min.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+    <link href="Content/jquery-ui.css" rel="stylesheet" />
+    <script src="Scripts/jquery-ui.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.13/r-2.1.0/datatables.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/additional-methods.min.js"></script>
+
+
+    <style>
+        /* Move down content because we have a fixed navbar that is 50px tall */
+        html {
+            /*overflow-y: scroll;*/
+        }
+
+        body {
+            background-color: #F5F5F5;
+            /*padding-top: 150px;
+            padding-top: 60px;*/
+            padding-bottom: 20px;
+            /*background-color: #eeeeee;*/
+            /*background-color: #FAFAFA;*/
+            /*font-family: 'Open Sans', sans-serif;*/
+            /*-webkit-font-smoothing: antialiased;
+            -webkit-text-shadow: rgba(0,0,0,.01) 0 0 1px;
+            text-shadow: rgba(0,0,0,.01) 0 0 1px;*/
+            height: 100%;
+            max-height: 100%;
+        }
+
+        /* Wrapping element */
+        /* Set some basic padding to keep content from hitting the edges */
+        .body-content {
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        #breadcrumb {
+            margin-left: 0;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        #loadingModal {
+            position: fixed;
+            z-index: 9000;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba( 255, 255, 255, .8 ) url('http://i.stack.imgur.com/FhHRx.gif') 50% 50% no-repeat;
+        }
+
+        /* When the body has the loading class, we turn
+           the scrollbar off with overflow:hidden */
+        body.loading {
+            overflow: hidden;
+        }
+
+            /* Anytime the body has the loading class, our
+           modal element will be visible */
+            body.loading #loadingmodal {
+                display: block;
+            }
+
+        #lower-navbar {
+            position: fixed;
+            top: 50px;
+            height: 42px;
+            width: 100%;
+            /*background-color: #fff;*/
+            /*background-color: #F5F5F5;*/
+            /*background-color: #e7e7e7;*/
+            line-height: 40px;
+            border-bottom: 1px solid #EEEEEE;
+            border-bottom: 1px solid #ddd;
+            background-color: #fff;
+            z-index: 50;
+        }
+
+        .lower-navbar-wrapper {
+            position: fixed;
+            top: 50px;
+            z-index: 100;
+            width: 100%;
+        }
+
+        .lower-navbar-wrapper {
+            background-color: #FAFAFA;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #main_navbar .navbar-default {
+            background-color: #303F9F;
+            background-color: #2b5797;
+            background-color: #0D47A1;
+            background-color: #3F51B5;
+            border-bottom: 1px solid #ddd;
+            /*-webkit-box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.30);
+            -moz-box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.30);
+            box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.30);*/
+            border-radius: 0;
+            margin-bottom: 0px;
+            top: 0;
+            height: 50px;
+            width: 100%;
+            position: fixed;
+        }
+
+        #main-content-wrapper {
+            /*position: fixed;*/
+            top: 92px; /*Set top value to HeightOfTopFrameDiv*/
+            margin-top: 92px;
+            margin-left: auto;
+            margin-right: auto;
+            /*background-color: #fff;*/
+            /*overflow: auto;*/
+            width: 100%;
+            bottom: 0;
+            /*border-top: 1px solid #ddd;*/
+        }
+
+        .navbar-default {
+            border-radius: 0;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
+            margin-bottom: 5px;
+        }
+
+        .navbar-nav > li > a {
+            padding-top: 14px;
+            padding-bottom: 14px;
+        }
+
+        .navbar-nav > li:last-child {
+            margin-right: 15px;
+        }
+
+        .navbar {
+            min-height: 30px;
+        }
+
+
+        /*.navbar-default .navbar-brand {
+                color: #C5CAE9;
+            }
+
+                .navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover {
+                    color: #8C9EFF;
+                }
+
+            .navbar-default .navbar-nav > li > a {
+                color: #C5CAE9;
+            }
+
+                .navbar-default .navbar-nav > li > a:hover {
+                    color: #8C9EFF;
+                }*/
+
+        .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover {
+            /*color: rgba(255,255,255,1);*/
+            background-color: transparent;
+            background-color: #F5F5F5;
+            background-color: #fff;
+            color: rgba(255,255,255,1);
+        }
+
+        .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
+            background-color: #303F9F;
+            color: rgba(255,255,255,0.87);
+            border-bottom: 0;
+        }
+
+        .navbar-default .navbar-brand {
+            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.67);
+            color: #8C9EFF;
+            color: #fff;
+            color: rgba(255,255,255,0.87);
+            /*font-weight: 100;*/
+        }
+
+            .navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover {
+                color: rgba(255,255,255,0.77);
+            }
+
+        .dropdown-menu {
+            border: 1px solid #ddd;
+            box-shadow: none;
+            -webkit-box-shadow: none;
+        }
+
+            .dropdown-menu > li > a {
+                padding: 2px 20px;
+            }
+
+            .dropdown-menu .divider {
+                margin: 5px 0;
+            }
+
+        .panel {
+            border-color: #EEEEEE;
+        }
+
+        #tabs > li > a {
+            padding-top: 11px;
+            margin-top: 5px;
+            z-index: 55;
+        }
+
+            #tabs > li > a:hover {
+                color: #fff;
+                color: rgba(255,255,255,0.77);
+            }
+
+        #tabs > li.active > a {
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            color: #777;
+            /*-webkit-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
+-moz-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
+box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
+        }
+
+            #tabs > li.active > a:hover {
+                color: #555;
+            }
+
+        .navbar-default .navbar-nav > li > a {
+            color: #ffffff;
+            color: rgba(255,255,255,0.87);
+            /*color: #fff;*/
+        }
+
+            .navbar-default .navbar-nav > li > a:focus, .navbar-default .navbar-nav > li > a:hover {
+                color: rgba(255,255,255,0.77);
+            }
+
+        #upper_navbar {
+            top: 50px;
+            position: fixed;
+            margin-left: 0;
+            margin-right: 0;
+            width: 100%;
+        }
+
+            #upper_navbar .navbar-default {
+                background-color: #283593;
+                height: 40px;
+            }
+    </style>
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server" enctype="multipart/form-data">
+        <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" EnablePageMethods="true"></asp:ScriptManager>
+        <div class="" id="main_navbar">
+            <div class="navbar navbar-default navbar-static-top">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">Visibility Portal</a>
+                        <%--<a class="btn btn-primary navbar-btn" data-toggle="modal" data-target="#newModal">New Visibility</a>--%>
+                    </div>
+
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav" id="tabs">
+                            <li runat="server" id="visibLink">
+                                <asp:LinkButton ID="visibLinkBtn" runat="server" OnClick="visibLinkBtn_Click">Visibility</asp:LinkButton>
+                            </li>
+                            <li runat="server" id="workplanLink"><a href="tl_workplan.aspx">Workplan<span class="sr-only">(current)</span></a></li>
+                            <%--<li><a href="Visibility_Programs.aspx">Programs</a></li>
+                            <li><a href="Visibility_Report.aspx">Reports</a></li>--%>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <%--<li><a href="Main.aspx">Back to Main Portal</a></li>--%>
+
+
+                            <%--<li><a href="#">Settings</a></li>--%>
+                            <%--<li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Profile</a></li>
+                                    <li><a href="#">Settings</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li role="separator" class="divider"></li>
+                                </ul>
+                            </li>--%>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <span class="fa fa-user"></span>
+                                    <asp:Label ID="username" runat="server" Text=""></asp:Label>
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="change_password.aspx"><i class="fa fa-cog"></i>&nbsp;Change Password</a>
+                                    </li>
+                                    <li role="separator" class="divider"></li>
+                                    <li>
+                                        <asp:LinkButton ID="logoutBtn" runat="server" OnClick="logoutBtn_Click"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Sign out</asp:LinkButton>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- /.navbar-collapse -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <%--<div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <asp:UpdatePanel ID="UpdatePanel1" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-cog"></i>&nbsp;Change Password</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="" id="changePasswordForm">
+                                    <asp:Label ID="messagelbl" runat="server" Text=""></asp:Label>
+                                    <br>
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label">New Password</label>
+                                            <div class="col-sm-7">
+                                                <asp:TextBox CssClass="form-control" ID="newPassword" ClientIDMode="Static" TextMode="Password" runat="server"></asp:TextBox>
+                                                <asp:RegularExpressionValidator EnableClientScript="false" ID="regex1" runat="server" Display="Dynamic" CssClass="help-block" ControlToValidate="newPassword" ValidationExpression="^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$" ErrorMessage="Password must contain: Minimum 8 characters atleast 1 Alphabet, 1 Number and 1 Special Character"></asp:RegularExpressionValidator>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label">Confirm Password</label>
+                                            <div class="col-sm-7">
+                                                <asp:TextBox CssClass="form-control" ID="confirmPassword" ClientIDMode="Static" TextMode="Password" runat="server"></asp:TextBox>
+                                                <asp:Label ID="confirmPasswordValidator" runat="server" Text=""></asp:Label>
+                                                <asp:CompareValidator EnableClientScript="false" ID="CompareValidator1" runat="server" Display="Dynamic" CssClass="help-block" ControlToCompare="newPassword" Operator="Equal" Type="String" ControlToValidate="confirmPassword" ErrorMessage="Passwords don't match"></asp:CompareValidator>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label">Old Password</label>
+                                            <div class="col-sm-7">
+                                                <asp:TextBox CssClass="form-control" ID="oldPassword" ClientIDMode="Static" TextMode="Password" runat="server"></asp:TextBox>
+                                                <asp:RequiredFieldValidator EnableClientScript="false" ID="RequiredFieldValidator1" ControlToValidate="oldpassword" runat="server" ErrorMessage="RequiredFieldValidator"></asp:RequiredFieldValidator>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="btn-group">
+                                    <asp:Button ID="cancelBtn" CausesValidation="false" CssClass="btn btn-sm btn-default" runat="server" Text="Cancel" OnClick="cancelBtn_Click" />
+                                    <asp:Button ID="saveBtn" CssClass="btn btn-sm btn-primary" runat="server" Text="Save Changes" OnClick="saveBtn_Click" />
+                                </div>
+                            </div>
+                        </div>
+                    </ContentTemplate>
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="cancelBtn" />
+                        <asp:AsyncPostBackTrigger ControlID="saveBtn" />
+                    </Triggers>
+                </asp:UpdatePanel>
+            </div>
+        </div>--%>
+
+        <div class="">
+            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+            </asp:ContentPlaceHolder>
+        </div>
+
+        <script type="text/javascript">
+            function extendedValidatorUpdateDisplay(obj) {
+                // Appelle la méthode originale
+                if (typeof originalValidatorUpdateDisplay === "function") {
+                    originalValidatorUpdateDisplay(obj);
+                }
+                // Récupère l'état du control (valide ou invalide) 
+                // et ajoute ou enlève la classe has-error
+                var control = document.getElementById(obj.controltovalidate);
+                if (control) {
+                    var isValid = true;
+                    for (var i = 0; i < control.Validators.length; i += 1) {
+                        if (!control.Validators[i].isvalid) {
+                            isValid = false;
+                            break;
+                        }
+                    }
+                    if (isValid) {
+                        $(control).closest(".form-group").removeClass("has-error");
+                    } else {
+                        $(control).closest(".form-group").addClass("has-error");
+                    }
+                }
+            }
+            // Remplace la méthode ValidatorUpdateDisplay
+            var originalValidatorUpdateDisplay = window.ValidatorUpdateDisplay;
+            window.ValidatorUpdateDisplay = extendedValidatorUpdateDisplay;
+
+
+            function closeChangePasswordModal() {
+                $('#changePasswordModal').modal('hide');
+            }
+
+            function openChangePasswordModal() {
+                $('#changePasswordModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            }
+
+            $(document).ready(function () {
+                
+            });
+
+            //function abortPostback(){
+            //    Sys.WebForms.PageRequestManager.getInstance().abortPostBack();
+            //}
+
+            //Sys.WebForms.PageRequestManager.getInstance().add_initializeRequest();
+
+            function validateForm(){
+                return $("#form1").valid();
+                //if(!isValid){
+                //    //alert("valid: "+isValid);
+                //    return false;
+                //}
+            }
+
+            //Sys.Application.add_init(appl_init);
+
+            //function appl_init(){
+            //    var pgRegMgr = sys.WebForms.PageRequestManager.getInstance();
+            //    pgRegMgr.add_beginRequest(validateForm);
+            //}
+
+            <%--Sys.Application.add_load(function() {
+                $("#form1").validate({
+                    debug: true,
+                    rules: {
+                        <%=newPassword.UniqueID%>:
+                        {
+                            required: true,
+                        },
+                    },
+                    messages: {
+                        <%=newPassword.UniqueID%>:
+                        {
+                            required: "Password is required."
+                        },
+                    },
+                    onsubmit: false,
+                });
+            });--%>
+
+        </script>
+    </form>
+</body>
+</html>
+
