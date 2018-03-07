@@ -8,24 +8,6 @@
             background-color: #eee;
         }
 
-        /*.form-signin {
-            max-width: 300px;
-            padding: 15px;
-            margin: 0 auto;
-        }
-
-        hr{
-            margin-bottom: 35px !important;
-        }
-
-        .panel{
-            border-radius: 0;
-        }
-
-        .form-control{
-            border-radius: 0;
-        }*/
-
         .panel{
             border-radius: 0;
         }
@@ -96,7 +78,7 @@
                         <asp:TextBox ID="inputPassword" CssClass="form-control" placeholder="Password" required="trues" runat="server" TextMode="Password"></asp:TextBox>
                     </div>
                     <asp:Label ID="invalidLogin" runat="server" Text=""></asp:Label>
-                    <div class="checkbox">
+                    <div class="checkbox hidden">
                         <label>
                             <asp:CheckBox ID="rememberCheckBox" runat="server" />
                             Remember me

@@ -286,7 +286,7 @@
                                                             </td>
                                                             <td class="">
                                                                 <div class="text-center">
-                                                                    <asp:LinkButton ID="addPicBtn" OnClientClick="refreshForm();" runat="server" CssClass="btn btn-primary btn-sm" CommandName="addPicture" CommandArgument='<%# Eval("id") %>'>Add Picture</asp:LinkButton>
+                                                                    <asp:LinkButton ID="addPicBtn" OnClientClick="refreshModal();" runat="server" CssClass="btn btn-primary btn-sm" CommandName="addPicture" CommandArgument='<%# Eval("id") %>'>Add Picture</asp:LinkButton>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -343,9 +343,6 @@
                                                             <br />
                                                             <div class="row">
                                                                 <div class="col-md-4 col-sm-4 text-center">
-                                                                    <div class="hidden">
-                                                                        <img src="<%# DataBinder.Eval(Container.DataItem, "filePath") %>" class="img-responsive" alt="<%# DataBinder.Eval(Container.DataItem, "name") %>" />
-                                                                    </div>
                                                                     <div>
                                                                         <asp:Image ID="picCon" runat="server" CssClass="img-responsive" />
 
@@ -372,27 +369,6 @@
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col-md-4 col-sm-4 col-xs-4 hidden">
-                                                                                <div class="form-group">
-                                                                                    <label class="">Capture Date</label>
-                                                                                    <div class="">
-                                                                                        <asp:TextBox ID="dateCaptured" CssClass="form-control date" runat="server"></asp:TextBox>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="form-group hidden">
-                                                                            <label class="">Shelf Brand</label>
-                                                                            <div class="">
-                                                                                <%--<select class="form-control" id="">
-                                                                                <option>Select Shelf</option>
-                                                                            </select>--%>
-                                                                                <asp:DropDownList ID="shelfBrandDDL" runat="server" CssClass="form-control" Visible="false">
-                                                                                    <asp:ListItem Value="0">-Select Shelf-</asp:ListItem>
-                                                                                </asp:DropDownList>
-                                                                                <%--<asp:RequiredFieldValidator Display="Dynamic" InitialValue="0" ID="RequiredFieldValidator1" runat="server" ErrorMessage="<strong class='text-danger'>This is required!</strong>" ControlToValidate="shelfBrandDDL"></asp:RequiredFieldValidator>--%>
-                                                                                <asp:Label ID="shelfValidate" runat="server" Text=""></asp:Label>
-                                                                            </div>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label class="">Remarks</label>
@@ -406,43 +382,6 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <%--<div class="row">
-                                                            <div class="col-sm-3">
-                                                                <div class="form-group">
-                                                                    <label>Branch Code</label>
-                                                                    <p class="form-control-static">SSD</p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-3">
-                                                                <div class="form-group">
-                                                                    <label>Shelf Brand Code</label>
-                                                                    <select class="form-control" id="">
-                                                                        <option>Select Shelf</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-3">
-                                                                <div class="form-group">
-                                                                    <label>Measure</label>
-                                                                    <p class="form-control-static">POG</p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-3">
-                                                                <div class="form-group">
-                                                                    <label>Capture Date</label>
-                                                                    <p class="form-control-static">YYYYMMDD</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>--%>
-                                                                    <%--<div class="form-group">
-                                                            <label>Brands</label>
-                                                            <input type="text" class="form-control" />
-                                                        </div>--%>
-                                                                    <%--<div class="form-group">
-                                                            <label>Remarks</label>
-                                                            <textarea class="form-control" rows="2"></textarea>
-                                                        </div>--%>
-                                                                    <%--<a class="btn btn-danger">Delete</a>--%>
                                                                 </div>
                                                             </div>
                                                             <br />

@@ -16,11 +16,13 @@ using System.Drawing.Imaging;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Drawing.Drawing2D;
+using System.Net;
+using System.Collections.Specialized;
 
 public partial class new_visibility : System.Web.UI.Page
 {
     clsDBLayer DBLayer = new clsDBLayer(ConfigurationManager.ConnectionStrings["VisibilityDB"].ToString());
-    clsFTPLayer ftpLayer = new clsFTPLayer("tpa", "~!n0v3mb3r@@2017!~", "23.89.193.176", 80, "ftp");
+    clsFTPLayer ftpLayer = new clsFTPLayer("tpa", "~!n0v3mb3r@@2017!~", "23.89.193.176", 80, "http");
     //Will user this later for saving visibility to db without querying data from db
     List<clsVisibility> visibilityList = new List<clsVisibility>();
     List<clsVisibilitySurvey> surveyList = new List<clsVisibilitySurvey>();
@@ -73,7 +75,7 @@ public partial class new_visibility : System.Web.UI.Page
 
             if (workplan.Status == "Pending")
             {
-                closeBtnPlaceholder.Visible = false;
+                closeBtnPlaceholder.Visible = true;
             }
 
             if (workplan.Status == "Submitted")
@@ -101,7 +103,7 @@ public partial class new_visibility : System.Web.UI.Page
                     uploadBtnPlaceholder.Visible = false;
                     saveBtn.Visible = false;
                     cancelBtn.Visible = false;
-                    closeBtnPlaceholder.Visible = false;
+                    closeBtnPlaceholder.Visible = true;
                 }
             }
             else if (user.Type.Equals("Team Leader"))
@@ -628,30 +630,6 @@ public partial class new_visibility : System.Web.UI.Page
         string workplanId = Request.QueryString["pk"];
         clsWorkplan workplan = DBLayer.getWorkplan(workplanId);
 
-        if (e.CommandName == "uploadPhoto")
-        {
-            
-            //FileUpload file = (FileUpload)e.Item.FindControl("FileUpload1");
-            //testLbl.Text = file.HasFile + "";
-
-            //if (picture.PostedFile != null)
-            //{ 
-            //    string test = picture.Value.ToString(); 
-            //}
-            
-            //string filename = System.IO.Path.GetFileName(picture.fil);
-            //testLbl.Text = picture.PostedFile.ContentLength+"";
-            //testLbl.Text = picture.PostedFile.FileName + "";
-
-            
-            //if (FileUpload1.HasFile)
-            //{
-            //    string fileName = Path.GetFileName(FileUpload1.PostedFile.FileName);
-            //    FileUpload1.PostedFile.SaveAs(Server.MapPath("~/Images/") + fileName);
-            //    Response.Redirect(Request.Url.AbsoluteUri);
-            //}
-
-        }
         if (e.CommandName == "addPicture")
         {
             string responseId = (string)e.CommandArgument;
@@ -685,7 +663,7 @@ public partial class new_visibility : System.Web.UI.Page
         clsUser user = (clsUser)Session["user"];
         string oldpath;
         string newpath;
-        string strDirectory = DBLayer.GetCurrentTime().ToString("yyyyMM");
+        string strDirectory = "Images/" + DBLayer.GetCurrentTime().ToString("yyyyMM");
         string tmpDirectory =  "temp";
         DateTime? dateTaken = null;
         string extension = Path.GetExtension(e.FileName);
@@ -693,97 +671,151 @@ public partial class new_visibility : System.Web.UI.Page
         if (contentType.Equals("image/jpeg") || contentType.Equals("image/gif") || contentType.Equals("image/png") || contentType.Equals("image/jpg"))
         {
             Stream imageStr = myFile.FileContent;
-            if (ftpLayer.createDirectory(strDirectory))
+            try
             {
-                // Extract date captured.  
-                using(System.Drawing.Image image = new Bitmap(imageStr)){
-                    int OrientationId = 0x132;
-                    int[] ids = image.PropertyIdList;
-                    PropertyItem propItem = null;
-                    if (ids.Contains(OrientationId))
-                    {
-                        propItem = image.GetPropertyItem(OrientationId);
-                    }
-                    //Get the Date Created property  
-                    if (propItem != null)
-                    {
-                        // Extract the property value (a string).  
-                        System.Text.ASCIIEncoding encoding = new System.Text.ASCIIEncoding();
-                        string text = encoding.GetString(propItem.Value, 0, propItem.Len - 1);
-
-                        // Parse the date and time.  
-                        System.Globalization.CultureInfo provider = CultureInfo.InvariantCulture;
-                        dateTaken = DateTime.ParseExact(text, "yyyy:MM:d H:m:s", provider);
-                    }
-                }
-
-                //Create pic name using pic Id from db
-                string pictureId;
-
-                using (var entitiesContext = new Entities())
+                if (ftpLayer.createDirectory(strDirectory))
                 {
-                    Data_Visibility_Picture pic = new Data_Visibility_Picture();
-                    pic.response_id = int.Parse(responseIdHidden.Value);
-                    pic.user_id = int.Parse(user.Id);
-                    pic.date_created = DBLayer.GetCurrentTime();
-
-                    if (dateTaken.HasValue)
+                    // Extract date captured.  
+                    using (System.Drawing.Image image = new Bitmap(imageStr))
                     {
-                        pic.date_captured = dateTaken;
-                        pic.date_captured2 = dateTaken;
+                        int OrientationId = 0x132;
+                        int[] ids = image.PropertyIdList;
+                        PropertyItem propItem = null;
+                        if (ids.Contains(OrientationId))
+                        {
+                            propItem = image.GetPropertyItem(OrientationId);
+                        }
+                        //Get the Date Created property  
+                        if (propItem != null)
+                        {
+                            // Extract the property value (a string).  
+                            System.Text.ASCIIEncoding encoding = new System.Text.ASCIIEncoding();
+                            string text = encoding.GetString(propItem.Value, 0, propItem.Len - 1);
+
+                            // Parse the date and time.  
+                            System.Globalization.CultureInfo provider = CultureInfo.InvariantCulture;
+                            dateTaken = DateTime.ParseExact(text, "yyyy:MM:d H:m:s", provider);
+                        }
                     }
-                    else
+
+                    //Create pic name using pic Id from db
+                    string pictureId;
+
+                    using (var entitiesContext = new Entities())
                     {
-                        pic.date_captured = DBLayer.GetCurrentTime();
+                        Data_Visibility_Picture pic = new Data_Visibility_Picture();
+                        pic.response_id = int.Parse(responseIdHidden.Value);
+                        pic.user_id = int.Parse(user.Id);
+                        pic.date_created = DBLayer.GetCurrentTime();
+
+                        if (dateTaken.HasValue)
+                        {
+                            pic.date_captured = dateTaken;
+                            //pic.date_captured2 = dateTaken;
+                        }
+                        else
+                        {
+                            //pic.date_captured = DBLayer.GetCurrentTime();
+                        }
+
+                        entitiesContext.Data_Visibility_Picture.Add(pic);
+                        entitiesContext.SaveChanges();
+                        pictureId = pic.id.ToString();
                     }
 
-                    entitiesContext.Data_Visibility_Picture.Add(pic);
-                    entitiesContext.SaveChanges();
-                    pictureId = pic.id.ToString();
+                    String name = "VISIB" + "_" + DBLayer.GetCurrentTime().ToString("yyyyMMdd") + "_" + pictureId;
+                    String thumbnail_name = "VISIB" + "_" + DBLayer.GetCurrentTime().ToString("yyyyMMdd") + "_" + pictureId + "_thumbnail";
+                    int ctr = 1;
+
+                    //Check if pic name has duplicates
+                    while (ftpLayer.exists(strDirectory + "/" + name + extension))
+                    {
+                        name += ctr + extension;
+                        ctr++;
+                    }
+
+                    //Finally, add file extension
+                    name += extension;
+                    thumbnail_name += extension;
+
+                    //Compress pic
+                    int imageH = 1920;
+                    int imageW = 1080;
+                    int thumbnailH = 640;
+                    int thumbnailW = 300;
+                    using (Bitmap i = new Bitmap(myFile.FileContent))
+                    {
+                        if (i.Height < i.Width)
+                        {
+                            imageH = 1080;
+                            imageW = 1920;
+                            thumbnailH = 300;
+                            thumbnailW = 640;
+                        }
+                    }
+
+                    Stream compressedImage = imageHandler.compressImage(myFile.FileContent, imageH, imageW, 75);
+                    Stream compressedThumbnail = imageHandler.compressImage(myFile.FileContent, thumbnailH, thumbnailW, 25);
+                    Bitmap sample = new Bitmap(compressedImage);
+                    byte[] compressedImageB = ftpLayer.ReadFully(compressedImage);
+                    byte[] compressedThumbnailB = ftpLayer.ReadFully(compressedThumbnail);
+
+                    if (compressedImageB.Length > 0)
+                    {
+                        //ftpLayer.uploadImage(compressedImageB, strDirectory + "/" + name, "http://23.89.193.176/Upload.aspx");
+                        //ftpLayer.uploadImage(compressedImageB, strDirectory + "/" + name, "http://localhost:2198/Upload.aspx");
+                        //ftpLayer.uploadImage(compressedImage, strDirectory + "/" + name, "http://localhost:2198/Upload.aspx");
+                        //ftpLayer.uploadImage(compressedThumbnailB, strDirectory + "/" + thumbnail_name, "http://23.89.193.176/Upload.aspx");
+                        //ftpLayer.uploadImage(compressedThumbnailB, strDirectory + "/" + thumbnail_name, "http://localhost:2198/Upload.aspx");
+                        //ftpLayer.uploadImage(compressedThumbnail, strDirectory + "/" + thumbnail_name, "http://localhost:2198/Upload.aspx");
+                        NameValueCollection nvc = new NameValueCollection();
+                        nvc.Add("filename", name);
+                        nvc.Add("filepath", strDirectory + "/" + name);
+                        ftpLayer.HttpUploadFile("http://23.89.193.176/Upload.aspx", compressedImageB, "bytesContent", "image/jpeg", nvc);
+                        
+                        nvc = new NameValueCollection();
+                        nvc.Add("filename", thumbnail_name);
+                        nvc.Add("filepath", strDirectory + "/" + thumbnail_name);
+                        ftpLayer.HttpUploadFile("http://23.89.193.176/Upload.aspx", compressedThumbnailB, "bytesContent", "image/jpeg", nvc);
+                    }
+
+                    //Save pic
+                    //ftpLayer.uploadImage(compressedImage, strDirectory + "/" + name);
+
+                    //ftpLayer.uploadImage(compressedThumbnail, strDirectory + "/" + thumbnail_name);
+
+                    //Update pic entry in db
+                    using (Entities context = new Entities())
+                    {
+                        var picEntry = context.Data_Visibility_Picture.Find(int.Parse(pictureId));
+                        picEntry.name = name;
+                        picEntry.file_name = name;
+                        picEntry.file_path = strDirectory + "/" + name;
+                        picEntry.file_size_b = compressedImage.Length;
+                        picEntry.thumbnail_name = thumbnail_name;
+                        picEntry.thumbnail_path = strDirectory + "/" + thumbnail_name;
+                        picEntry.height = sample.Height;
+                        picEntry.width = sample.Width;
+
+                        Data_User_Activity_Log act_log = new Data_User_Activity_Log();
+                        act_log.username = user.Username;
+                        act_log.dateCreated = DBLayer.GetCurrentTime();
+                        act_log.pageUrl = HttpContext.Current.Request.Url.AbsolutePath;
+                        act_log.activity = "uploaded " + name + " in response::" + responseIdHidden.Value;
+                        context.Data_User_Activity_Log.Add(act_log);
+
+                        context.SaveChanges();
+                    }
+
+                    
+
                 }
-
-                String name = "VISIB" + "_" + DBLayer.GetCurrentTime().ToString("yyyyMMdd") + "_" + pictureId + extension;
-                String thumbnail_name = "VISIB" + "_" + DBLayer.GetCurrentTime().ToString("yyyyMMdd") + "_" + pictureId + "_thumbnail" + extension;
-
-                //Check if pic name has duplicates
-                while (ftpLayer.exists(strDirectory + "/"+name))
-                {
-
-                }
-
-                //Compress pic
-                Stream compressedImage = imageHandler.compressImage(myFile.FileContent,1080,1920,75);
-                Stream compressedThumbnail = imageHandler.compressImage(myFile.FileContent, 300, 640, 25);
-                Bitmap sample = new Bitmap(compressedImage);
-
-                //Save pic
-                ftpLayer.uploadImage(compressedImage, strDirectory + "/" + name);
-                ftpLayer.uploadImage(compressedThumbnail, strDirectory + "/" + thumbnail_name);
-
-                //Update pic entry in db
-                using (Entities context = new Entities())
-                {
-                    var picEntry = context.Data_Visibility_Picture.Find(int.Parse(pictureId));
-                    picEntry.name = name;
-                    picEntry.file_name = name;
-                    picEntry.file_path = strDirectory + "/" + name;
-                    picEntry.file_size_b = compressedImage.Length;
-                    picEntry.thumbnail_name = thumbnail_name;
-                    picEntry.thumbnail_path = strDirectory + "/" + thumbnail_name;
-                    picEntry.height = sample.Height;
-                    picEntry.width = sample.Width;
-
-                    Data_User_Activity_Log act_log = new Data_User_Activity_Log();
-                    act_log.username = user.Username;
-                    act_log.dateCreated = DBLayer.GetCurrentTime();
-                    act_log.pageUrl = HttpContext.Current.Request.Url.AbsolutePath;
-                    act_log.activity = "uploaded " + name + " in response::" + responseIdHidden.Value;
-                    context.Data_User_Activity_Log.Add(act_log);
-
-                    context.SaveChanges();
-                }
-
             }
+            catch (WebException ex)
+            {
+                throw ex;
+            }
+            
 
 
         }
@@ -836,6 +868,7 @@ public partial class new_visibility : System.Web.UI.Page
             System.Web.UI.WebControls.Image img = (System.Web.UI.WebControls.Image)e.Item.FindControl("picCon");
             //Stream image = ftpLayer.downloadImage(((clsVisibilityPicture)e.Item.DataItem).FilePath);
             img.ImageUrl = ResolveUrl("~/FTPImageHandler.ashx?id="+pictureId);
+
             //DropDownList shelfBrandDDL = (DropDownList)e.Item.FindControl("shelfBrandDDL");
             //List<clsVisibilityShelfBrand> shelfList = DBLayer.getShelfBrandList();
             //foreach (clsVisibilityShelfBrand shelf in shelfList)
@@ -858,17 +891,17 @@ public partial class new_visibility : System.Web.UI.Page
             TextBox measureTxtBox = (TextBox)e.Item.FindControl("measure");
             measureTxtBox.Text = response.Code;
 
-            DateTime? temp = null;
-            if ((((clsVisibilityPicture)e.Item.DataItem).DateCaptured2) == "")
-            {
-                temp = DateTime.Parse(((clsVisibilityPicture)e.Item.DataItem).DateCaptured);
-            }
-            else
-            {
-                temp = DateTime.Parse(((clsVisibilityPicture)e.Item.DataItem).DateCaptured2);
-            }
-            TextBox dateCaptured = (TextBox)e.Item.FindControl("dateCaptured");
-            dateCaptured.Text = ((DateTime)temp).ToString("yyyy-MM-dd");
+            //DateTime? temp = null;
+            //if ((((clsVisibilityPicture)e.Item.DataItem).DateCaptured2) == "")
+            //{
+            //    temp = DateTime.Parse(((clsVisibilityPicture)e.Item.DataItem).DateCaptured);
+            //}
+            //else
+            //{
+            //    temp = DateTime.Parse(((clsVisibilityPicture)e.Item.DataItem).DateCaptured2);
+            //}
+            //TextBox dateCaptured = (TextBox)e.Item.FindControl("dateCaptured");
+            //dateCaptured.Text = ((DateTime)temp).ToString("yyyy-MM-dd");
             
             string workplanId = Request.QueryString["pk"];
             clsWorkplan workplan = DBLayer.getWorkplan(workplanId);
@@ -877,7 +910,7 @@ public partial class new_visibility : System.Web.UI.Page
 
             if (workplan.Status.Equals("Submitted"))
             {
-                dateCaptured.ReadOnly = true;
+                //dateCaptured.ReadOnly = true;
                 //shelfBrandDDL.Enabled = false;
                 remarks.ReadOnly = true;
                 deleteBtn.Visible = false;
@@ -888,7 +921,7 @@ public partial class new_visibility : System.Web.UI.Page
             {
                 if (workplan.Status == "For Approval")
                 {
-                    dateCaptured.ReadOnly = true;
+                    //dateCaptured.ReadOnly = true;
                     //shelfBrandDDL.Enabled = false;
                     remarks.ReadOnly = true;
                     deleteBtn.Visible = false;
@@ -964,58 +997,32 @@ public partial class new_visibility : System.Web.UI.Page
         {
             if (item.ItemType == ListItemType.Item || item.ItemType == ListItemType.AlternatingItem)
             {
-                clsVisibilityPicture picture = new clsVisibilityPicture();
-                string name;
                 HiddenField picId = (HiddenField)item.FindControl("HiddenFieldPicId");
+                TextBox remarks = (TextBox)item.FindControl("remarks");
                 TextBox branchCode = (TextBox)item.FindControl("branchCode");
                 TextBox measureTxtBox = (TextBox)item.FindControl("measure");
-                TextBox dateCaptured = (TextBox)item.FindControl("dateCaptured");
-                //DropDownList shelfBrandDDL = (DropDownList)item.FindControl("shelfBrandDDL");
-                //Label shelfValidate = (Label)item.FindControl("shelfValidate");
-                TextBox remarks = (TextBox)item.FindControl("remarks");
-                //clsVisibilityShelfBrand shelf = DBLayer.getShelfBrand(shelfBrandDDL.SelectedValue);
-                DateTime capturedDate = Convert.ToDateTime(dateCaptured.Text);
-                
-                //string message = "<p class='text-danger'>";
-                //if(shelfBrandDDL.SelectedValue=="0"){
-                //    message += "This is required!";
-                //    message += "</p>";
-                //    validation ++;
-                //}
-                //else
-                //{
-                //    message = "";
-                //}
-                //shelfValidate.Text = message;
+                clsUser user = (clsUser)Session["user"];
 
-                name = branchCode.Text + "_" + response.Standard + "_" + measureTxtBox.Text + "_" + capturedDate.ToString("yyyyMMdd");
-                picture.Id = picId.Value;
-                picture.Name = name;
-                //picture.ShelfId = shelfBrandDDL.SelectedValue;
-                picture.DateCaptured = dateCaptured.Text;
-                picture.Remarks = remarks.Text;
-
-                if (validation==0)
+                using (var entitiesContext = new Entities())
                 {
-                    DBLayer.updateVisibilityPictureById(picture); 
+                    Data_Visibility_Picture pic = entitiesContext.Data_Visibility_Picture.Find(int.Parse(picId.Value));
+                    pic.remarks = remarks.Text;
+                    pic.date_modified = DBLayer.GetCurrentTime();
+                    entitiesContext.SaveChanges();
+                    if (user != null)
+                    {
+                        Data_User_Activity_Log act_log = new Data_User_Activity_Log();
+                        act_log.username = user.Username;
+                        act_log.dateCreated = DBLayer.GetCurrentTime();
+                        act_log.pageUrl = HttpContext.Current.Request.Url.AbsolutePath;
+                        act_log.activity = "saved picture changes in response::" + responseId;
+                        entitiesContext.Data_User_Activity_Log.Add(act_log);
+                        entitiesContext.SaveChanges();
+                    }
                 }
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "closeModal();", true);
             }
         }
-        if (validation==0)
-        {
-            clsUser user = (clsUser)Session["user"];
-            if (user != null)
-            {
-                clsActivityLog log = new clsActivityLog();
-                log.Username = user.Username;
-                log.DateCreated = DBLayer.GetCurrentTime().ToString();
-                log.PageUrl = HttpContext.Current.Request.Url.AbsolutePath;
-                log.Activity = "saved picture changes in response::" + responseId;
-                DBLayer.addNewActivityLog(log);
-            }    
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "closeModal();", true);
-        }
-
     }
     protected void cancelBtn_Click(object sender, EventArgs e)
     {
@@ -1094,8 +1101,8 @@ public partial class new_visibility : System.Web.UI.Page
             log.PageUrl = HttpContext.Current.Request.Url.AbsolutePath;
             log.Activity = "submitted visib of visit::" + workplanId;
             DBLayer.addNewActivityLog(log);
-        }  
-        //Response.Redirect("View_Visibility.aspx?pk=" + workplanId);
+        }
+        Response.Redirect("View_Visibility.aspx?pk=" + workplanId);
         message += "<div id='myAlert' class='alert alert-success fade' role='alert'>";
         message += "<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>";
         message += "<p class='text-success'>Survey successfully submitted!</p>";

@@ -8,73 +8,42 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <meta charset="utf-8" />
-    <%--<meta name="viewport" content="width=device-width, initial-scale=1.0" />--%>
     <title><%: Page.Title %></title>
-
-
     <link href="Content/bootstrap.min.css" rel="stylesheet" />
-    <%--    <link href="Content/font-awesome.css" rel="stylesheet" />
-    <link href="Content/font-awesome.min.css" rel="stylesheet" />--%>
-    <%--<link href="Content/jquery-ui.css" rel="stylesheet" />--%>
-    <%--<script src="Scripts/jquery-ui.js"></script>--%>
-    <script src="https://use.fontawesome.com/47b39e3381.js"></script>
     <link href="Content/awesome-bootstrap-checkbox.css" rel="stylesheet" />
-
     <link href="Content/visibility.css" rel="stylesheet" />
     <link href="Content/select2.min.css" rel="stylesheet" />
     <link href="Content/select2-bootstrap.min.css" rel="stylesheet" />
     <link href="Content/select2-bootstrap.css" rel="stylesheet" />
-
     <link href="Content/custom.css?v=1" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet" />
+    <link href="Content/jquery-ui.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.15/b-1.3.1/b-colvis-1.3.1/cr-1.3.3/fc-3.2.2/fh-3.1.2/kt-2.2.1/r-2.1.1/rg-1.0.0/rr-1.2.0/sc-1.4.2/se-1.2.2/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.dataTables.min.css" />
+    <link href="Content/bootstrap-modal-carousel.min.css" rel="stylesheet" />
 
-
-    <%--<script src="Scripts/jquery-1.12.4.js"></script>--%>
+    <script src="https://use.fontawesome.com/47b39e3381.js"></script>    
     <script
         src="https://code.jquery.com/jquery-1.12.4.min.js"
         integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
     <script src="Scripts/bootstrap.min.js"></script>
-    <link href="Content/jquery-ui.css" rel="stylesheet" />
     <script src="Scripts/jquery-ui.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.15/b-1.3.1/b-colvis-1.3.1/cr-1.3.3/fc-3.2.2/fh-3.1.2/kt-2.2.1/r-2.1.1/rg-1.0.0/rr-1.2.0/sc-1.4.2/se-1.2.2/datatables.min.css" />
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.15/b-1.3.1/b-colvis-1.3.1/cr-1.3.3/fc-3.2.2/fh-3.1.2/kt-2.2.1/r-2.1.1/rg-1.0.0/rr-1.2.0/sc-1.4.2/se-1.2.2/datatables.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.dataTables.min.css" />
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/additional-methods.min.js"></script>
-
-    <link href="Content/bootstrap-modal-carousel.min.css" rel="stylesheet" />
     <script src="Scripts/bootstrap-modal-carousel.min.js"></script>
     <script src="Scripts/demo.min.js"></script>
     <script src="Scripts/AsyncFileUploadValidationPlugin.js"></script>
 
 
     <style>
-        /* Move down content because we have a fixed navbar that is 50px tall */
-        html {
-            /*overflow-y: scroll;*/
-        }
-
         body {
             background-color: #F5F5F5;
-            /*background-color: #F0F0F0;*/
-            /*padding-top: 150px;
-            padding-top: 60px;*/
-            /*padding-bottom: 20px;*/
-            /*background-color: #eeeeee;*/
-            /*background-color: #FAFAFA;*/
-            /*font-family: 'Open Sans', sans-serif;*/
-            /*-webkit-font-smoothing: antialiased;
-            -webkit-text-shadow: rgba(0,0,0,.01) 0 0 1px;
-            text-shadow: rgba(0,0,0,.01) 0 0 1px;*/
             height: 100%;
             max-height: 100%;
-            /*font: 14px "Roboto Medium", Helvetica, "Droid Sans", Tahoma, Geneva, sans-serif;*/
         }
-
 
         /* Wrapping element */
         /* Set some basic padding to keep content from hitting the edges */
@@ -118,9 +87,6 @@
             top: 50px;
             height: 42px;
             width: 100%;
-            /*background-color: #fff;*/
-            /*background-color: #F5F5F5;*/
-            /*background-color: #e7e7e7;*/
             line-height: 40px;
             border-bottom: 1px solid #EEEEEE;
             border-bottom: 1px solid #ddd;
@@ -148,9 +114,6 @@
             background-color: #0D47A1;
             background-color: #3F51B5;
             border-bottom: 1px solid #ddd;
-            /*-webkit-box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.30);
-            -moz-box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.30);
-            box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.30);*/
             border-radius: 0;
             margin-bottom: 0px;
             top: 0;
@@ -160,16 +123,12 @@
         }
 
         #main-content-wrapper {
-            /*position: fixed;*/
             top: 92px; /*Set top value to HeightOfTopFrameDiv*/
             margin-top: 92px;
             margin-left: auto;
             margin-right: auto;
-            /*background-color: #fff;*/
-            /*overflow: auto;*/
             width: 100%;
             bottom: 0;
-            /*border-top: 1px solid #ddd;*/
         }
 
         .navbar-default {
@@ -193,25 +152,7 @@
             min-height: 30px;
         }
 
-
-        /*.navbar-default .navbar-brand {
-                color: #C5CAE9;
-            }
-
-                .navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover {
-                    color: #8C9EFF;
-                }
-
-            .navbar-default .navbar-nav > li > a {
-                color: #C5CAE9;
-            }
-
-                .navbar-default .navbar-nav > li > a:hover {
-                    color: #8C9EFF;
-                }*/
-
         .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover {
-            /*color: rgba(255,255,255,1);*/
             background-color: transparent;
             background-color: #F5F5F5;
             background-color: #fff;
@@ -270,9 +211,6 @@
             border-top-left-radius: 3px;
             border-top-right-radius: 3px;
             color: #777;
-            /*-webkit-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
--moz-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
         }
 
             #tabs > li.active > a:hover {
@@ -282,7 +220,6 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
         .navbar-default .navbar-nav > li > a {
             color: #ffffff;
             color: rgba(255,255,255,0.87);
-            /*color: #fff;*/
         }
 
             .navbar-default .navbar-nav > li > a:focus, .navbar-default .navbar-nav > li > a:hover {
@@ -307,17 +244,12 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
         }
     </style>
 
-    <script type="text/javascript">
-
-        
-    </script>
-
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
 <body>
     <form id="form1" runat="server" enctype="multipart/form-data">
-        <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" EnablePageMethods="true"></asp:ScriptManager>
+        <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" EnablePageMethods="true" AsyncPostBackTimeout="500"></asp:ScriptManager>
         <uc1:TimeoutControl runat="server" ID="TimeoutControl" />
         <div class="modal fade" id="modalSessionTimeoutWarning" role="dialog">
             <div class="modal-dialog" role="document">
@@ -347,37 +279,17 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
                             <span class="icon-bar"></span>
                         </button>
                         <a class="navbar-brand" href="#">Visibility Portal</a>
-                        <%--<a class="btn btn-primary navbar-btn" data-toggle="modal" data-target="#newModal">New Visibility</a>--%>
                     </div>
 
-                    <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <ul class="nav navbar-nav" id="tabs">
                             <li runat="server" id="visibLink">
                                 <asp:LinkButton ID="visibLinkBtn" runat="server" OnClick="visibLinkBtn_Click">Surveys</asp:LinkButton>
                             </li>
                             <li runat="server" id="workplanLink"><a href="tl_workplan.aspx">Workplan<span class="sr-only">(current)</span></a></li>
-                            <%--<li runat="server" id="programLink"><a href="Visibility_Programs.aspx">Programs</a></li>--%>
-                            <%--<li><a href="Visibility_Report.aspx">Reports</a></li>--%>
                             <li runat="server" id="coorLink"><a href="coordinator.aspx">Coordinator</a></li>
-
-
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
-                            <%--<li><a href="Main.aspx">Back to Main Portal</a></li>--%>
-
-
-                            <%--<li><a href="#">Settings</a></li>--%>
-                            <%--<li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <span class="caret"></span></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">Profile</a></li>
-                                    <li><a href="#">Settings</a></li>
-                                    <li role="separator" class="divider"></li>
-                                    <li role="separator" class="divider"></li>
-                                </ul>
-                            </li>--%>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                     <span class="fa fa-user"></span>
@@ -385,10 +297,6 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
                                     <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <%
-                                    //<li><a href="change_password.aspx"><i class="fa fa-cog"></i>&nbsp;Change Password</a></li>    
-                                    //<li role="separator" class="divider"></li>
-                                    %>
                                     <li>
                                         <asp:LinkButton ID="logoutBtn" runat="server" OnClick="logoutBtn_Click"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Sign out</asp:LinkButton>
                                         <asp:LinkButton ID="sessionTimeoutBtn" runat="server" CssClass="hidden" OnClick="sessionTimeoutBtn_Click">Session Timeout</asp:LinkButton>
@@ -402,145 +310,16 @@ box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);*/
             </div>
         </div>
 
-        <!-- Modal -->
-        <%--<div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <asp:UpdatePanel ID="UpdatePanel1" runat="server" UpdateMode="Conditional">
-                    <ContentTemplate>
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-cog"></i>&nbsp;Change Password</h4>
-                            </div>
-                            <div class="modal-body">
-                                <div class="" id="changePasswordForm">
-                                    <asp:Label ID="messagelbl" runat="server" Text=""></asp:Label>
-                                    <br>
-                                    <div class="form-horizontal">
-                                        <div class="form-group">
-                                            <label class="col-sm-4 control-label">New Password</label>
-                                            <div class="col-sm-7">
-                                                <asp:TextBox CssClass="form-control" ID="newPassword" ClientIDMode="Static" TextMode="Password" runat="server"></asp:TextBox>
-                                                <asp:RegularExpressionValidator EnableClientScript="false" ID="regex1" runat="server" Display="Dynamic" CssClass="help-block" ControlToValidate="newPassword" ValidationExpression="^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$" ErrorMessage="Password must contain: Minimum 8 characters atleast 1 Alphabet, 1 Number and 1 Special Character"></asp:RegularExpressionValidator>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="col-sm-4 control-label">Confirm Password</label>
-                                            <div class="col-sm-7">
-                                                <asp:TextBox CssClass="form-control" ID="confirmPassword" ClientIDMode="Static" TextMode="Password" runat="server"></asp:TextBox>
-                                                <asp:Label ID="confirmPasswordValidator" runat="server" Text=""></asp:Label>
-                                                <asp:CompareValidator EnableClientScript="false" ID="CompareValidator1" runat="server" Display="Dynamic" CssClass="help-block" ControlToCompare="newPassword" Operator="Equal" Type="String" ControlToValidate="confirmPassword" ErrorMessage="Passwords don't match"></asp:CompareValidator>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="col-sm-4 control-label">Old Password</label>
-                                            <div class="col-sm-7">
-                                                <asp:TextBox CssClass="form-control" ID="oldPassword" ClientIDMode="Static" TextMode="Password" runat="server"></asp:TextBox>
-                                                <asp:RequiredFieldValidator EnableClientScript="false" ID="RequiredFieldValidator1" ControlToValidate="oldpassword" runat="server" ErrorMessage="RequiredFieldValidator"></asp:RequiredFieldValidator>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <div class="btn-group">
-                                    <asp:Button ID="cancelBtn" CausesValidation="false" CssClass="btn btn-sm btn-default" runat="server" Text="Cancel" OnClick="cancelBtn_Click" />
-                                    <asp:Button ID="saveBtn" CssClass="btn btn-sm btn-primary" runat="server" Text="Save Changes" OnClick="saveBtn_Click" />
-                                </div>
-                            </div>
-                        </div>
-                    </ContentTemplate>
-                    <Triggers>
-                        <asp:AsyncPostBackTrigger ControlID="cancelBtn" />
-                        <asp:AsyncPostBackTrigger ControlID="saveBtn" />
-                    </Triggers>
-                </asp:UpdatePanel>
-            </div>
-        </div>--%>
-
         <div class="">
             <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
             </asp:ContentPlaceHolder>
         </div>
 
         <script type="text/javascript">
-
-            //Set timeouts for when the warning message
-            //should be displayed, and what should happen 
-            //when the session actually expires.
             function pageLoad() {
-                //setTimeout('ShowSessionTimeoutWarning()', '<%=iWarningTimeoutInMilliseconds%>');
-                setTimeout(function () {
-                    //window.location = '<%=sTargetURLForSessionTimeout%>';
-                    $('#<%=sessionTimeoutBtn.ClientID%>').click();
-                }, 120000);
-
                 initializeSettings();
             }
-
-            //Notify the user that his session is ABOUT to expire.
-            //Do so by making our warning div tag visible.
-            function ShowSessionTimeoutWarning() {
-                $("#modalSessionTimeoutWarning").modal();
-            }
-
-            //Notify the user that his session HAS expired.
-            function ShowSessionExpiredNotification() {
-                $("#modalSessionTimeoutWarning").modal();
-
-                //Send the user to a new page.
-                window.location = '<%=sTargetURLForSessionTimeout%>';
-            }
-
-            function ResetClientSideSessionTimers() {
-                $("#modalSessionTimeoutWarning").modal('hide');
-            }
-
-            function extendedValidatorUpdateDisplay(obj) {
-                // Appelle la méthode originale
-                if (typeof originalValidatorUpdateDisplay === "function") {
-                    originalValidatorUpdateDisplay(obj);
-                }
-                // Récupère l'état du control (valide ou invalide) 
-                // et ajoute ou enlève la classe has-error
-                var control = document.getElementById(obj.controltovalidate);
-                if (control) {
-                    var isValid = true;
-                    for (var i = 0; i < control.Validators.length; i += 1) {
-                        if (!control.Validators[i].isvalid) {
-                            isValid = false;
-                            break;
-                        }
-                    }
-                    if (isValid) {
-                        $(control).closest(".form-group").removeClass("has-error");
-                    } else {
-                        $(control).closest(".form-group").addClass("has-error");
-                    }
-                }
-            }
-            // Remplace la méthode ValidatorUpdateDisplay
-            var originalValidatorUpdateDisplay = window.ValidatorUpdateDisplay;
-            window.ValidatorUpdateDisplay = extendedValidatorUpdateDisplay;
-
-
-            function closeChangePasswordModal() {
-                $('#changePasswordModal').modal('hide');
-            }
-
-            function openChangePasswordModal() {
-                $('#changePasswordModal').modal({
-                    backdrop: 'static',
-                    keyboard: false
-                });
-            }
-
-            function validateForm() {
-                return $("#form1").valid();
-            }
-
         </script>
-
-
     </form>
 </body>
 </html>

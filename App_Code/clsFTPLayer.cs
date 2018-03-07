@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Web;
 
 /// <summary>
@@ -33,8 +37,8 @@ public class clsFTPLayer
 
         try
         {
-            FtpWebRequest ftpRequest = (FtpWebRequest)FtpWebRequest.Create("ftp://"+IpAddress);
-            ftpRequest.Credentials = new NetworkCredential(UserName, Password);
+            FtpWebRequest httpRequest = (FtpWebRequest)FtpWebRequest.Create("ftp://"+IpAddress);
+            httpRequest.Credentials = new NetworkCredential(UserName, Password);
 
         }
         catch (Exception ex)
@@ -51,24 +55,22 @@ public class clsFTPLayer
     {
         try
         {
-            /* Create an FTP Request */
-            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + newDirectory);
-            /* Log in to the FTP Server with the User Name and Password Provided */
-            ftpRequest.Credentials = new NetworkCredential(UserName, Password);
+            /* Create an HTTP Request */
+            HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + newDirectory);
+            /* Log in to the HTTP Server with the User Name and Password Provided */
+            httpRequest.Credentials = new NetworkCredential(UserName, Password);
             /* When in doubt, use these options */
-            ftpRequest.UseBinary = true;
-            ftpRequest.UsePassive = true;
-            ftpRequest.KeepAlive = true;
+            httpRequest.KeepAlive = true;
             /* Specify the Type of FTP Request */
-            ftpRequest.Method = WebRequestMethods.Ftp.MakeDirectory;
+            httpRequest.Method = WebRequestMethods.Http.MkCol;
             /* Establish Return Communication with the FTP Server */
-            FtpWebResponse ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
-            Stream ftpStream = ftpResponse.GetResponseStream();
+            HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+            Stream httpStream = httpResponse.GetResponseStream();
 
 
             /* Resource Cleanup */
-            ftpResponse.Close();
-            ftpStream.Close();
+            httpResponse.Close();
+            httpStream.Close();
 
             return true;
 
@@ -76,9 +78,9 @@ public class clsFTPLayer
         }
         catch (WebException ex)
         {
-            FtpWebResponse response = (FtpWebResponse)ex.Response;
+            HttpWebResponse response = (HttpWebResponse)ex.Response;
             //if directory already exists, return true
-            if (response.StatusCode == FtpStatusCode.ActionNotTakenFileUnavailable)
+            if (response.StatusCode == HttpStatusCode.Gone || response.StatusCode == HttpStatusCode.MethodNotAllowed)
             {
                 response.Close();
                 return true;
@@ -97,17 +99,17 @@ public class clsFTPLayer
         try
         {
             /* Create an FTP Request */
-            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + remoteFile);
+            FtpWebRequest httpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + remoteFile);
             /* Log in to the FTP Server with the User Name and Password Provided */
-            ftpRequest.Credentials = new NetworkCredential(UserName, Password);
+            httpRequest.Credentials = new NetworkCredential(UserName, Password);
             /* When in doubt, use these options */
-            ftpRequest.UseBinary = true;
-            ftpRequest.UsePassive = true;
-            ftpRequest.KeepAlive = true;
+            httpRequest.UseBinary = true;
+            httpRequest.UsePassive = true;
+            httpRequest.KeepAlive = true;
             /* Specify the Type of FTP Request */
-            ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+            httpRequest.Method = WebRequestMethods.Ftp.UploadFile;
             /* Establish Return Communication with the FTP Server */
-            Stream ftpStream = ftpRequest.GetRequestStream();
+            Stream ftpStream = httpRequest.GetRequestStream();
             /* Open a File Stream to Read the File for Upload */
             FileStream localFileStream = new FileStream(localFile, FileMode.Create);
             /* Buffer for the Downloaded Data */
@@ -127,7 +129,7 @@ public class clsFTPLayer
             /* Resource Cleanup */
             localFileStream.Close();
             ftpStream.Close();
-            ftpRequest = null;
+            httpRequest = null;
             return true;
         }
         catch(WebException ex)
@@ -151,17 +153,17 @@ public class clsFTPLayer
         try
         {
             /* Create an FTP Request */
-            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + image);
+            FtpWebRequest httpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + image);
             /* Log in to the FTP Server with the User Name and Password Provided */
-            ftpRequest.Credentials = new NetworkCredential(UserName, Password);
+            httpRequest.Credentials = new NetworkCredential(UserName, Password);
             /* When in doubt, use these options */
-            ftpRequest.UseBinary = true;
-            ftpRequest.UsePassive = true;
-            ftpRequest.KeepAlive = true;
+            httpRequest.UseBinary = true;
+            httpRequest.UsePassive = true;
+            httpRequest.KeepAlive = true;
             /* Specify the Type of FTP Request */
-            ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+            httpRequest.Method = WebRequestMethods.Ftp.UploadFile;
             /* Establish Return Communication with the FTP Server */
-            Stream ftpStream = ftpRequest.GetRequestStream();
+            Stream ftpStream = httpRequest.GetRequestStream();
             /* Open a File Stream to Read the File for Upload */
             //FileStream localFileStream = new FileStream(localFile, FileMode.Create);
 
@@ -173,67 +175,83 @@ public class clsFTPLayer
         }
     }
 
-    public bool uploadImage(Stream image, string target)
+    public bool uploadImage(Stream image, string filename, string actionUrl)
     {
-        Stream requestStream = null;
+        Stream container = new MemoryStream();
+        image.Seek(0, SeekOrigin.Begin);
+        image.CopyTo(container);
         try
         {
-            /* Create an FTP Request */
-            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + target);
-            /* Log in to the FTP Server with the User Name and Password Provided */
-            ftpRequest.Credentials = new NetworkCredential(UserName, Password);
-            /* When in doubt, use these options */
-            ftpRequest.UseBinary = true;
-            ftpRequest.UsePassive = true;
-            ftpRequest.KeepAlive = true;
-            /* Specify the Type of FTP Request */
-            ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
-            ftpRequest.ContentLength = image.Length;
-            
-            /* Establish Return Communication with the FTP Server */
-            requestStream = ftpRequest.GetRequestStream();
+            HttpContent streamContent = new StreamContent(container);
+            //HttpContent bytesContent = new ByteArrayContent(image);
+            HttpContent stringContent = new StringContent(filename);
 
-            //Avoid to write zero length files in destiny. 
-            //If you have read the stream before for any reason (as a convertion to Bitmap to extract dimensions, for example)
-            image.Seek(0, SeekOrigin.Begin);
+            using (var clientHandler = new HttpClientHandler())
+            {
+                clientHandler.Credentials = new NetworkCredential(UserName, Password);
+                using (var client = new HttpClient(clientHandler))
+                {
+                    client.Timeout = TimeSpan.FromMinutes(30);
+                    using (var formData = new MultipartFormDataContent())
+                    {
+                        try
+                        {
+                            formData.Add(streamContent, "streamContent");
+                            //formData.Add(bytesContent, "bytesContent", filename);
+                            formData.Add(stringContent, "stringContent");
+                            var response = client.PostAsync(actionUrl, formData).Result;
+                            var result = response.Content.ReadAsStringAsync().Result;
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
 
-            /* Open a File Stream to Read the File for Upload */
-            //FileStream localFileStream = new FileStream(localFile, FileMode.Create);
-            //byte[] fileDate = File.ReadAllBytes(image);
-
-            image.CopyTo(requestStream);
-            requestStream.Close();
-
+                    }
+                }
+            }
 
             return false;
         }
         catch (WebException ex)
         {
+            throw ex;
             return true;
         }
     }
 
     public bool exists(string targetPath)
     {
-        FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + targetPath);
-        ftpRequest.Credentials = new NetworkCredential(UserName, Password);
-        ftpRequest.UseBinary = true;
-        ftpRequest.UsePassive = true;
-        ftpRequest.KeepAlive = true;
-        ftpRequest.Method = WebRequestMethods.Ftp.GetFileSize;
+        HttpWebResponse response = null;
+
+        /* Create an HTTP Request */
+        HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + targetPath);
+        /* Log in to the HTTP Server with the User Name and Password Provided */
+        httpRequest.Credentials = new NetworkCredential(UserName, Password);
+        /* Specify the Type of FTP Request */
+        httpRequest.Method = "HEAD";
 
         try
         {
-            FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse();
+            response = (HttpWebResponse)httpRequest.GetResponse();
+            return true;
         }
         catch (WebException ex)
         {
-            FtpWebResponse response = (FtpWebResponse)ex.Response;
-            if (response.StatusCode == FtpStatusCode.ActionNotTakenFileUnavailable)
+            response = (HttpWebResponse)ex.Response;
+            if (response.StatusCode == HttpStatusCode.Gone || response.StatusCode == HttpStatusCode.MethodNotAllowed)
             {
                 return false;
             }
             return false;   
+        }
+        finally
+        {
+            // Don't forget to close your response.
+            if (response != null)
+            {
+                response.Close();
+            }
         }
         return true;
     }
@@ -244,17 +262,17 @@ public class clsFTPLayer
         try
         {
             /* Create an FTP Request */
-            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + target);
+            FtpWebRequest httpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + target);
             /* Log in to the FTP Server with the User Name and Password Provided */
-            ftpRequest.Credentials = new NetworkCredential(UserName, Password);
+            httpRequest.Credentials = new NetworkCredential(UserName, Password);
             /* When in doubt, use these options */
-            ftpRequest.UseBinary = true;
-            ftpRequest.UsePassive = true;
-            ftpRequest.KeepAlive = true;
+            httpRequest.UseBinary = true;
+            httpRequest.UsePassive = true;
+            httpRequest.KeepAlive = true;
             /* Specify the Type of FTP Request */
-            ftpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
+            httpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
             /* Establish Return Communication with the FTP Server */
-            FtpWebResponse ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
+            FtpWebResponse ftpResponse = (FtpWebResponse)httpRequest.GetResponse();
             image = ftpResponse.GetResponseStream();
 
 
@@ -275,29 +293,143 @@ public class clsFTPLayer
 
     public void delete(string deleteFile)
     {
-        FtpWebRequest ftpRequest = null;
-        FtpWebResponse ftpResponse = null;
+        HttpWebRequest httpRequest = null;
+        HttpWebResponse httpResponse = null;
         try
         {
             /* Create an FTP Request */
-            ftpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + deleteFile);
-            /* Log in to the FTP Server with the User Name and Password Provided */
-            ftpRequest.Credentials = new NetworkCredential(UserName, Password);
-            /* When in doubt, use these options */
-            ftpRequest.UseBinary = true;
-            ftpRequest.UsePassive = true;
-            ftpRequest.KeepAlive = true;
-            /* Specify the Type of FTP Request */
-            ftpRequest.Method = WebRequestMethods.Ftp.DeleteFile;
-            /* Establish Return Communication with the FTP Server */
-            ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
-            /* Resource Cleanup */
-            ftpResponse.Close();
-            ftpRequest = null;
+            //httpRequest = (FtpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + deleteFile);
+            ///* Log in to the FTP Server with the User Name and Password Provided */
+            //httpRequest.Credentials = new NetworkCredential(UserName, Password);
+            ///* When in doubt, use these options */
+            //httpRequest.UseBinary = true;
+            //httpRequest.UsePassive = true;
+            //httpRequest.KeepAlive = true;
+            ///* Specify the Type of FTP Request */
+            //httpRequest.Method = WebRequestMethods.Http.
+            ///* Establish Return Communication with the FTP Server */
+            //ftpResponse = (FtpWebResponse)httpRequest.GetResponse();
+            ///* Resource Cleanup */
+            //ftpResponse.Close();
+            //httpRequest = null;
+
+            httpRequest = (HttpWebRequest)WebRequest.Create(Host + "://" + IpAddress + "/" + deleteFile);
+            httpRequest.Credentials = new NetworkCredential(UserName, Password);
+            httpRequest.KeepAlive = true;
+            httpRequest.Method = "Delete";
+
+            httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+            httpResponse.Close();
+            httpRequest = null;
+
+
+
+
+
+
         }
         catch(Exception ex)
         {
 
         }
     }
+
+
+    public byte[] ReadFully(Stream input)
+    {
+        //byte[] buffer = new byte[16 * 1024];
+        //using (MemoryStream ms = new MemoryStream())
+        //{
+        //    int read;
+        //    while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+        //    {
+        //        ms.Write(buffer, 0, read);
+        //    }
+        //    return ms.ToArray();
+        //}
+
+        MemoryStream ms = new MemoryStream();
+        input.Seek(0, SeekOrigin.Begin);
+        input.CopyTo(ms);
+        return ms.ToArray();
+
+    }
+
+    public void HttpUploadFile(string url, byte[] file, string paramName, string contentType, NameValueCollection nvc)
+    {
+        Console.WriteLine(string.Format("Uploading {0} to {1}", file, url));
+        string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+        byte[] boundarybytes = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "\r\n");
+
+        HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
+        wr.ContentType = "multipart/form-data; boundary=" + boundary;
+        wr.Method = "POST";
+        wr.KeepAlive = true;
+        wr.Credentials = System.Net.CredentialCache.DefaultCredentials;
+        wr.Credentials = new NetworkCredential(UserName,Password);
+        wr.SendChunked = true;
+        wr.AllowWriteStreamBuffering = true;
+        wr.ReadWriteTimeout = 1 * 30 * 1000;
+        wr.Timeout = 600000;
+
+
+
+
+        Stream rs = wr.GetRequestStream();
+
+        string formdataTemplate = "Content-Disposition: form-data; name=\"{0}\"\r\n\r\n{1}";
+        foreach (string key in nvc.Keys)
+        {
+            rs.Write(boundarybytes, 0, boundarybytes.Length);
+            string formitem = string.Format(formdataTemplate, key, nvc[key]);
+            byte[] formitembytes = System.Text.Encoding.UTF8.GetBytes(formitem);
+            rs.Write(formitembytes, 0, formitembytes.Length);
+        }
+        rs.Write(boundarybytes, 0, boundarybytes.Length);
+
+        string headerTemplate = "Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\nContent-Type: {2}\r\n\r\n";
+        string header = string.Format(headerTemplate, paramName, file, contentType);
+        byte[] headerbytes = System.Text.Encoding.UTF8.GetBytes(header);
+        rs.Write(headerbytes, 0, headerbytes.Length);
+
+        //FileStream fileStream = new FileStream(file, FileMode.Open, FileAccess.Read);
+        //byte[] buffer = new byte[4096];
+        //int bytesRead = 0;
+        //while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
+        //{
+        //    rs.Write(buffer, 0, bytesRead);
+        //}
+        //fileStream.Close();
+        rs.Write(file, 0, file.Length);
+
+
+        byte[] trailer = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "--\r\n");
+        rs.Write(trailer, 0, trailer.Length);
+        rs.Close();
+
+        WebResponse wresp = null;
+        try
+        {
+            wresp = wr.GetResponse();
+            Stream stream2 = wresp.GetResponseStream();
+            StreamReader reader2 = new StreamReader(stream2);
+            Console.WriteLine(string.Format("File uploaded, server response is: {0}", reader2.ReadToEnd()));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error uploading file", ex);
+            if (wresp != null)
+            {
+                wresp.Close();
+                wresp = null;
+            }
+        }
+        finally
+        {
+            wr = null;
+        }
+    }
+    
 }
+
+

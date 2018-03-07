@@ -335,10 +335,24 @@ public partial class tl_workplan : System.Web.UI.Page
         //if (e.VisibleIndex == -1) return;
         DateTime callDate = new DateTime();
         callDate = Convert.ToDateTime(gvWorkplans.GetRowValues(e.VisibleIndex,"call_date"));
+        string status = gvWorkplans.GetRowValues(e.VisibleIndex, "status").ToString();
 
         if (e.ButtonType == ColumnCommandButtonType.Edit)
         {
-            if (GetCurrentTime() >= callDate)
+            if (GetCurrentTime() <= callDate)
+            {
+                Console.WriteLine("Pass");
+                if (status == "Pending")
+                {
+                    Console.WriteLine("Pass");
+                    e.Enabled = true;
+                }
+                else
+                {
+                    e.Enabled = false;
+                }
+            }
+            else
             {
                 e.Enabled = false;
             }
@@ -367,7 +381,7 @@ public partial class tl_workplan : System.Web.UI.Page
             if (e.Column.FieldName == "call_date")
             {
                 ASPxDateEdit call_date_edit = (ASPxDateEdit)e.Editor;
-                call_date_edit.MinDate = GetCurrentTime();
+                call_date_edit.MinDate = GetCurrentTime().AddDays(-10);
                 call_date_edit.DropDownButton.Enabled = false;
                 call_date_edit.DropDownButton.ClientVisible = false;
                 call_date_edit.ReadOnly = true;
@@ -384,6 +398,11 @@ public partial class tl_workplan : System.Web.UI.Page
             }
         }
 
+        if (e.Column.FieldName == "call_date")
+        {
+            ASPxDateEdit call_date_edit = (ASPxDateEdit)e.Editor;
+            call_date_edit.MinDate = GetCurrentTime().AddDays(-10);
+        }
         
 
         if (e.Column.FieldName == "fullname")

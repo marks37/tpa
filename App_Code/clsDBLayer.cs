@@ -1510,7 +1510,7 @@ ORDER BY call_date ASC";
         WHERE [workplan_id] = @workplanId";
 
         myCommand.Parameters.Add("@workplanId", System.Data.SqlDbType.Int);
-        myCommand.Parameters["@workplanId"].Value = workplanId;
+        myCommand.Parameters["@workplanId"].Value = int.Parse(workplanId);
 
         try
         {
@@ -2574,7 +2574,7 @@ ORDER BY call_date ASC";
         WHERE response.[id] = @responseId";
 
         myCommand.Parameters.Add("@responseId", System.Data.SqlDbType.Int);
-        myCommand.Parameters["@responseId"].Value = responseId;
+        myCommand.Parameters["@responseId"].Value = Int32.Parse(responseId);
 
         try
         {

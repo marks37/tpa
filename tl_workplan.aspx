@@ -592,14 +592,6 @@
                 "min": today
             });
 
-            //$("#myModal").on('show.bs.modal', function (e) {
-            //    $("#myModal").modal('handleUpdate');
-            //});
-
-            //$("#validateModal").on('show.bs.modal', function (e) {
-            //    $("#validateModal").modal('handleUpdate');
-            //});
-
         })
 
         function adjustGV() {
