@@ -322,16 +322,70 @@ public class clsFTPLayer
             httpResponse.Close();
             httpRequest = null;
 
-
-
-
-
-
         }
         catch(Exception ex)
         {
-
+            throw ex;
         }
+    }
+
+    public void delete(string url, NameValueCollection nvc)
+    {
+
+        //Console.WriteLine(string.Format("Uploading {0} to {1}", file, url));
+        string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+        byte[] boundarybytes = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "\r\n");
+
+        HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
+        wr.ContentType = "multipart/form-data; boundary=" + boundary;
+        wr.Method = "POST";
+        wr.KeepAlive = true;
+        wr.Credentials = System.Net.CredentialCache.DefaultCredentials;
+        wr.Credentials = new NetworkCredential(UserName, Password);
+        wr.SendChunked = true;
+        wr.AllowWriteStreamBuffering = true;
+        wr.ReadWriteTimeout = 1 * 30 * 1000;
+        wr.Timeout = 600000;
+
+        Stream rs = wr.GetRequestStream();
+
+        string formdataTemplate = "Content-Disposition: form-data; name=\"{0}\"\r\n\r\n{1}";
+        foreach (string key in nvc.Keys)
+        {
+            rs.Write(boundarybytes, 0, boundarybytes.Length);
+            string formitem = string.Format(formdataTemplate, key, nvc[key]);
+            byte[] formitembytes = System.Text.Encoding.UTF8.GetBytes(formitem);
+            rs.Write(formitembytes, 0, formitembytes.Length);
+        }
+        rs.Write(boundarybytes, 0, boundarybytes.Length);
+
+        byte[] trailer = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "--\r\n");
+        rs.Write(trailer, 0, trailer.Length);
+        rs.Close();
+
+        WebResponse wresp = null;
+        try
+        {
+            wresp = wr.GetResponse();
+            Stream stream2 = wresp.GetResponseStream();
+            StreamReader reader2 = new StreamReader(stream2);
+            Console.WriteLine(string.Format("File uploaded, server response is: {0}", reader2.ReadToEnd()));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error uploading file", ex);
+            if (wresp != null)
+            {
+                wresp.Close();
+                wresp = null;
+            }
+        }
+        finally
+        {
+            wr = null;
+        }
+
+
     }
 
 

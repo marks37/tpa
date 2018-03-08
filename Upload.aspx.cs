@@ -18,21 +18,32 @@ public partial class Upload : System.Web.UI.Page
         //    Console.WriteLine(key + " : " + nvc[key]);
         //}
 
-        Stream container = Request.InputStream;
+        //Stream container = Request.InputStream;
 
-        HttpPostedFile file = Request.Files["bytesContent"];
-        if (file != null && file.ContentLength > 0)
+        if (nvc["method"] == "delete")
         {
-            try
+            if ((System.IO.File.Exists(Server.MapPath(nvc["filepath"]))))
             {
-                //string fname = Path.GetFileName(file.FileName);
-                file.SaveAs(Server.MapPath(nvc["filepath"]));
+                System.IO.File.Delete(Server.MapPath(nvc["filepath"]));
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
         }
+        else if (nvc["method"] == "upload")
+        {
+            HttpPostedFile file = Request.Files["bytesContent"];
+            if (file != null && file.ContentLength > 0)
+            {
+                try
+                {
+                    string fname = Path.GetFileName(file.FileName);
+                    file.SaveAs(Server.MapPath(nvc["filepath"]));
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+        }
+
+        
     }
 }

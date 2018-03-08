@@ -75,7 +75,7 @@ public partial class new_visibility : System.Web.UI.Page
 
             if (workplan.Status == "Pending")
             {
-                closeBtnPlaceholder.Visible = true;
+                closeBtnPlaceholder.Visible = false;
             }
 
             if (workplan.Status == "Submitted")
@@ -771,11 +771,13 @@ public partial class new_visibility : System.Web.UI.Page
                         NameValueCollection nvc = new NameValueCollection();
                         nvc.Add("filename", name);
                         nvc.Add("filepath", strDirectory + "/" + name);
+                        nvc.Add("method", "upload");
                         ftpLayer.HttpUploadFile("http://23.89.193.176/Upload.aspx", compressedImageB, "bytesContent", "image/jpeg", nvc);
                         
                         nvc = new NameValueCollection();
                         nvc.Add("filename", thumbnail_name);
                         nvc.Add("filepath", strDirectory + "/" + thumbnail_name);
+                        nvc.Add("method", "upload");
                         ftpLayer.HttpUploadFile("http://23.89.193.176/Upload.aspx", compressedThumbnailB, "bytesContent", "image/jpeg", nvc);
                     }
 
@@ -948,12 +950,21 @@ public partial class new_visibility : System.Web.UI.Page
 
                 if (ftpLayer.exists(picture.file_path))
                 {
-                    ftpLayer.delete(picture.file_path);
+                    NameValueCollection nvc = new NameValueCollection();
+                    nvc.Add("filepath", picture.file_path);
+                    nvc.Add("method", "delete");
+                    ftpLayer.delete("http://23.89.193.176/Upload.aspx", nvc);
                 }
                 if (ftpLayer.exists(picture.thumbnail_path))
                 {
-                    ftpLayer.delete(picture.thumbnail_path);
+                    //ftpLayer.delete(picture.thumbnail_path);
+                    NameValueCollection nvc = new NameValueCollection();
+                    nvc.Add("filepath", picture.thumbnail_path);
+                    nvc.Add("method", "delete");
+                    ftpLayer.delete("http://23.89.193.176/Upload.aspx", nvc);
                 }
+
+                string stop = "";
 
                 DBLayer.removeVisibilityPictureById(pictureId);
                 e.Item.Visible = false;
